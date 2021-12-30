@@ -1,30 +1,8 @@
 # teiscript
 
-Empty project.
+타입스크립트로 만드는 인터프리터 언어
 
-## How to run on localhost
-
-First install dependencies:
-
-```sh
-npm install
-```
-
-To run in dev mode mode:
-
-```sh
-npm start
-```
-
-Then go to http://localhost:8080
-
-To create a production build:
-
-```sh
-npm run build
-```
-
-## Credits
-
-Made with [createapp.dev](https://createapp.dev/)
-
+### 개요
+- 밑바닥부터 만드는 인터프리터 in Go 책을 읽고 타입스크립트로도 한번 만들어보았습니다.
+- 대부분의 컴파일러나 인터프리터 책이 C 나 C++로 되어있어서 이 책을 선택했습니다.
+- 타입스크립트는 쿨하니까 타입스크립트로 변환해보았습니다.
