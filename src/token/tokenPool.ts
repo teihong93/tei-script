@@ -1,9 +1,9 @@
 export default {
   ILLEGAL: "ILLEGAL",
   EOF: "EOF",
-  INDENT: "INDENT",
+  IDENT: "IDENT",
   INT: "INT",
-  ASSIGN: ":",
+  ASSIGN: "=",
   PLUS: "+",
   COMMA: ",",
   SEMICOLON: ";",
