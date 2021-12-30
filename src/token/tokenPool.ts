@@ -1,0 +1,16 @@
+export default {
+  ILLEGAL: "ILLEGAL",
+  EOF: "EOF",
+  INDENT: "INDENT",
+  INT: "INT",
+  ASSIGN: ":",
+  PLUS: "+",
+  COMMA: ",",
+  SEMICOLON: ";",
+  LPAREN: "(",
+  RPAREN: ")",
+  RBRACE: "}",
+  LBRACE: "{",
+  FUNCTION: "FUNCTION",
+  LET: "LET",
+};

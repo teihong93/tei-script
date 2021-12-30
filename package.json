@@ -1,0 +1,28 @@
+{
+  "name": "teiscript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "teihong",
+  "license": "ISC",
+  "scripts": {
+    "clean": "rm dist/bundle.js",
+    "start": "snowpack build && node ./build/index.js",
+    "build": "snowpack build",
+    "test": "web-test-runner \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.3"
+  },
+  "devDependencies": {
+    "@snowpack/web-test-runner-plugin": "^0.2.2",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.0.0",
+    "@web/test-runner": "^0.13.23",
+    "chai": "^4.3.4",
+    "prettier": "^2.5.1",
+    "snowpack": "^3.8.8"
+  }
+}
