@@ -7,9 +7,7 @@
   "author": "teihong",
   "license": "ISC",
   "scripts": {
-    "clean": "rm dist/bundle.js",
-    "start": "snowpack build && node ./build/index.js",
-    "build": "snowpack build",
+    "start": "ts-node src",
     "test": "web-test-runner \"src/**/*.test.ts\""
   },
   "dependencies": {
