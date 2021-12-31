@@ -47,6 +47,21 @@ export function createLexer() {
         }
     };
 
+    const readDoubleToken = (preType: string): Ttoken => {
+        const doubleToken = lexerState.cursorChar + lexerState.input[lexerState.nextCursor];
+        const nextToken: Ttoken | undefined = {
+            '==': {Type: tokenPool.EQ, Literal: doubleToken},
+            '!=': {Type: tokenPool.NOT_EQ, Literal: doubleToken},
+        }[doubleToken];
+
+        if (!nextToken) {
+            return {Type: preType, Literal: lexerState.cursorChar as string};
+        }
+
+        readChar();
+        return nextToken;
+    };
+
     const nextToken = (): Ttoken => {
         skipWhiteSpace();
 
@@ -66,14 +81,14 @@ export function createLexer() {
         }
 
         const tok: Ttoken | undefined = {
-            '=': {Type: tokenPool.ASSIGN, Literal: lexerState.cursorChar},
+            '=': readDoubleToken(tokenPool.ASSIGN),
             ';': {Type: tokenPool.SEMICOLON, Literal: lexerState.cursorChar},
             '(': {Type: tokenPool.LPAREN, Literal: lexerState.cursorChar},
             ')': {Type: tokenPool.RPAREN, Literal: lexerState.cursorChar},
             ',': {Type: tokenPool.COMMA, Literal: lexerState.cursorChar},
             '+': {Type: tokenPool.PLUS, Literal: lexerState.cursorChar},
             '-': {Type: tokenPool.MINUS, Literal: lexerState.cursorChar},
-            '!': {Type: tokenPool.BANG, Literal: lexerState.cursorChar},
+            '!': readDoubleToken(tokenPool.BANG),
             '/': {Type: tokenPool.SLASH, Literal: lexerState.cursorChar},
             '*': {Type: tokenPool.ASTERISK, Literal: lexerState.cursorChar},
             '<': {Type: tokenPool.LT, Literal: lexerState.cursorChar},

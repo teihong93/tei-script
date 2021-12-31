@@ -11,6 +11,8 @@ export default {
     SLASH: '/',
     LT: '<',
     GT: '>',
+    EQ: '==',
+    NOT_EQ: '!=',
     COMMA: ',',
     SEMICOLON: ';',
     LPAREN: '(',

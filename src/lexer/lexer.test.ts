@@ -45,6 +45,9 @@ it('코드 형태 데이터에 대한 lexer 테스트', () => {
   } else {
     return false;
   }
+  
+  10 ==10;
+  10 !=9;
   `;
     const tokenTestCase: Ttoken[] = [
         {Type: tokenPool.LET, Literal: 'let'},
@@ -111,7 +114,15 @@ it('코드 형태 데이터에 대한 lexer 테스트', () => {
         {Type: tokenPool.RETURN, Literal: 'return'},
         {Type: tokenPool.FALSE, Literal: 'false'},
         {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.RBRACE, Literal: '}'},
+        {Type: tokenPool.RBRACE, Literal: '}'},//
+        {Type: tokenPool.INT, Literal: '10'},
+        {Type: tokenPool.EQ, Literal: '=='},
+        {Type: tokenPool.INT, Literal: '10'},
+        {Type: tokenPool.SEMICOLON, Literal: ';'},
+        {Type: tokenPool.INT, Literal: '10'},
+        {Type: tokenPool.NOT_EQ, Literal: '!='},
+        {Type: tokenPool.INT, Literal: '9'},
+        {Type: tokenPool.SEMICOLON, Literal: ';'},
         {Type: tokenPool.EOF, Literal: ''},
     ];
 
