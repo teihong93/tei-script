@@ -72,6 +72,12 @@ export function createLexer() {
             ')': {Type: tokenPool.RPAREN, Literal: lexerState.cursorChar},
             ',': {Type: tokenPool.COMMA, Literal: lexerState.cursorChar},
             '+': {Type: tokenPool.PLUS, Literal: lexerState.cursorChar},
+            '-': {Type: tokenPool.MINUS, Literal: lexerState.cursorChar},
+            '!': {Type: tokenPool.BANG, Literal: lexerState.cursorChar},
+            '/': {Type: tokenPool.SLASH, Literal: lexerState.cursorChar},
+            '*': {Type: tokenPool.ASTERISK, Literal: lexerState.cursorChar},
+            '<': {Type: tokenPool.LT, Literal: lexerState.cursorChar},
+            '>': {Type: tokenPool.GT, Literal: lexerState.cursorChar},
             '{': {Type: tokenPool.LBRACE, Literal: lexerState.cursorChar},
             '}': {Type: tokenPool.RBRACE, Literal: lexerState.cursorChar},
         }[lexerState.cursorChar];
