@@ -6,22 +6,22 @@ import {createLexer} from './lexter';
 it('토큰 테스트', () => {
     const input = '=+(){},;';
     const tokenTestCase: Ttoken[] = [
-        {Type: tokenPool.ASSIGN, Literal: '='},
-        {Type: tokenPool.PLUS, Literal: '+'},
-        {Type: tokenPool.LPAREN, Literal: '('},
-        {Type: tokenPool.RPAREN, Literal: ')'},
-        {Type: tokenPool.LBRACE, Literal: '{'},
-        {Type: tokenPool.RBRACE, Literal: '}'},
-        {Type: tokenPool.COMMA, Literal: ','},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.EOF, Literal: ''},
+        {type: tokenPool.ASSIGN, literal: '='},
+        {type: tokenPool.PLUS, literal: '+'},
+        {type: tokenPool.LPAREN, literal: '('},
+        {type: tokenPool.RPAREN, literal: ')'},
+        {type: tokenPool.LBRACE, literal: '{'},
+        {type: tokenPool.RBRACE, literal: '}'},
+        {type: tokenPool.COMMA, literal: ','},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.EOF, literal: ''},
     ];
 
     const lexer = createLexer().init({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
-        expect(currentToken.Type).to.equal(testToken.Type);
-        expect(currentToken.Literal).to.equal(testToken.Literal);
+        expect(currentToken.type).to.equal(testToken.type);
+        expect(currentToken.literal).to.equal(testToken.literal);
     }
 });
 
@@ -50,87 +50,87 @@ it('코드 형태 데이터에 대한 lexer 테스트', () => {
   10 !=9;
   `;
     const tokenTestCase: Ttoken[] = [
-        {Type: tokenPool.LET, Literal: 'let'},
-        {Type: tokenPool.IDENT, Literal: 'five'},
-        {Type: tokenPool.ASSIGN, Literal: '='},
-        {Type: tokenPool.INT, Literal: '5'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},//let five = 5;
-        {Type: tokenPool.LET, Literal: 'let'},
-        {Type: tokenPool.IDENT, Literal: 'ten'},
-        {Type: tokenPool.ASSIGN, Literal: '='},
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},//let ten = 10;
-        {Type: tokenPool.LET, Literal: 'let'},
-        {Type: tokenPool.IDENT, Literal: 'add'},
-        {Type: tokenPool.ASSIGN, Literal: '='},
-        {Type: tokenPool.FUNCTION, Literal: 'fn'},
-        {Type: tokenPool.LPAREN, Literal: '('},
-        {Type: tokenPool.IDENT, Literal: 'x'},
-        {Type: tokenPool.COMMA, Literal: ','},
-        {Type: tokenPool.IDENT, Literal: 'y'},
-        {Type: tokenPool.RPAREN, Literal: ')'},
-        {Type: tokenPool.LBRACE, Literal: '{'},
-        {Type: tokenPool.IDENT, Literal: 'x'},
-        {Type: tokenPool.PLUS, Literal: '+'},
-        {Type: tokenPool.IDENT, Literal: 'y'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.RBRACE, Literal: '}'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},//let add = fn(x,y) {x+y};
-        {Type: tokenPool.LET, Literal: 'let'},
-        {Type: tokenPool.IDENT, Literal: 'result'},
-        {Type: tokenPool.ASSIGN, Literal: '='},
-        {Type: tokenPool.IDENT, Literal: 'add'},
-        {Type: tokenPool.LPAREN, Literal: '('},
-        {Type: tokenPool.IDENT, Literal: 'five'},
-        {Type: tokenPool.COMMA, Literal: ','},
-        {Type: tokenPool.IDENT, Literal: 'ten'},
-        {Type: tokenPool.RPAREN, Literal: ')'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},//let result = add(five,ten);
-        {Type: tokenPool.BANG, Literal: '!'},
-        {Type: tokenPool.MINUS, Literal: '-'},
-        {Type: tokenPool.SLASH, Literal: '/'},
-        {Type: tokenPool.ASTERISK, Literal: '*'},
-        {Type: tokenPool.INT, Literal: '5'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},//  !-/*5;
-        {Type: tokenPool.INT, Literal: '5'},
-        {Type: tokenPool.LT, Literal: '<'},
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.GT, Literal: '>'},
-        {Type: tokenPool.INT, Literal: '5'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},// 5<10 > 5;
-        {Type: tokenPool.IF, Literal: 'if'},
-        {Type: tokenPool.LPAREN, Literal: '('},
-        {Type: tokenPool.INT, Literal: '5'},
-        {Type: tokenPool.LT, Literal: '<'},
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.RPAREN, Literal: ')'},
-        {Type: tokenPool.LBRACE, Literal: '{'},
-        {Type: tokenPool.RETURN, Literal: 'return'},
-        {Type: tokenPool.TRUE, Literal: 'true'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.RBRACE, Literal: '}'},
-        {Type: tokenPool.ELSE, Literal: 'else'},
-        {Type: tokenPool.LBRACE, Literal: '{'},
-        {Type: tokenPool.RETURN, Literal: 'return'},
-        {Type: tokenPool.FALSE, Literal: 'false'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.RBRACE, Literal: '}'},//
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.EQ, Literal: '=='},
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.INT, Literal: '10'},
-        {Type: tokenPool.NOT_EQ, Literal: '!='},
-        {Type: tokenPool.INT, Literal: '9'},
-        {Type: tokenPool.SEMICOLON, Literal: ';'},
-        {Type: tokenPool.EOF, Literal: ''},
+        {type: tokenPool.LET, literal: 'let'},
+        {type: tokenPool.IDENT, literal: 'five'},
+        {type: tokenPool.ASSIGN, literal: '='},
+        {type: tokenPool.INT, literal: '5'},
+        {type: tokenPool.SEMICOLON, literal: ';'},//let five = 5;
+        {type: tokenPool.LET, literal: 'let'},
+        {type: tokenPool.IDENT, literal: 'ten'},
+        {type: tokenPool.ASSIGN, literal: '='},
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.SEMICOLON, literal: ';'},//let ten = 10;
+        {type: tokenPool.LET, literal: 'let'},
+        {type: tokenPool.IDENT, literal: 'add'},
+        {type: tokenPool.ASSIGN, literal: '='},
+        {type: tokenPool.FUNCTION, literal: 'fn'},
+        {type: tokenPool.LPAREN, literal: '('},
+        {type: tokenPool.IDENT, literal: 'x'},
+        {type: tokenPool.COMMA, literal: ','},
+        {type: tokenPool.IDENT, literal: 'y'},
+        {type: tokenPool.RPAREN, literal: ')'},
+        {type: tokenPool.LBRACE, literal: '{'},
+        {type: tokenPool.IDENT, literal: 'x'},
+        {type: tokenPool.PLUS, literal: '+'},
+        {type: tokenPool.IDENT, literal: 'y'},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.RBRACE, literal: '}'},
+        {type: tokenPool.SEMICOLON, literal: ';'},//let add = fn(x,y) {x+y};
+        {type: tokenPool.LET, literal: 'let'},
+        {type: tokenPool.IDENT, literal: 'result'},
+        {type: tokenPool.ASSIGN, literal: '='},
+        {type: tokenPool.IDENT, literal: 'add'},
+        {type: tokenPool.LPAREN, literal: '('},
+        {type: tokenPool.IDENT, literal: 'five'},
+        {type: tokenPool.COMMA, literal: ','},
+        {type: tokenPool.IDENT, literal: 'ten'},
+        {type: tokenPool.RPAREN, literal: ')'},
+        {type: tokenPool.SEMICOLON, literal: ';'},//let result = add(five,ten);
+        {type: tokenPool.BANG, literal: '!'},
+        {type: tokenPool.MINUS, literal: '-'},
+        {type: tokenPool.SLASH, literal: '/'},
+        {type: tokenPool.ASTERISK, literal: '*'},
+        {type: tokenPool.INT, literal: '5'},
+        {type: tokenPool.SEMICOLON, literal: ';'},//  !-/*5;
+        {type: tokenPool.INT, literal: '5'},
+        {type: tokenPool.LT, literal: '<'},
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.GT, literal: '>'},
+        {type: tokenPool.INT, literal: '5'},
+        {type: tokenPool.SEMICOLON, literal: ';'},// 5<10 > 5;
+        {type: tokenPool.IF, literal: 'if'},
+        {type: tokenPool.LPAREN, literal: '('},
+        {type: tokenPool.INT, literal: '5'},
+        {type: tokenPool.LT, literal: '<'},
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.RPAREN, literal: ')'},
+        {type: tokenPool.LBRACE, literal: '{'},
+        {type: tokenPool.RETURN, literal: 'return'},
+        {type: tokenPool.TRUE, literal: 'true'},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.RBRACE, literal: '}'},
+        {type: tokenPool.ELSE, literal: 'else'},
+        {type: tokenPool.LBRACE, literal: '{'},
+        {type: tokenPool.RETURN, literal: 'return'},
+        {type: tokenPool.FALSE, literal: 'false'},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.RBRACE, literal: '}'},//
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.EQ, literal: '=='},
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.INT, literal: '10'},
+        {type: tokenPool.NOT_EQ, literal: '!='},
+        {type: tokenPool.INT, literal: '9'},
+        {type: tokenPool.SEMICOLON, literal: ';'},
+        {type: tokenPool.EOF, literal: ''},
     ];
 
     const lexer = createLexer().init({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
         console.log(currentToken);
-        expect(currentToken.Type).to.equal(testToken.Type);
-        expect(currentToken.Literal).to.equal(testToken.Literal);
+        expect(currentToken.type).to.equal(testToken.type);
+        expect(currentToken.literal).to.equal(testToken.literal);
     }
 });

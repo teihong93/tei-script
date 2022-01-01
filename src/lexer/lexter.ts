@@ -50,12 +50,12 @@ export function createLexer() {
     const readDoubleToken = (preType: string): Ttoken => {
         const doubleToken = lexerState.cursorChar + lexerState.input[lexerState.nextCursor];
         const nextToken: Ttoken | undefined = {
-            '==': {Type: tokenPool.EQ, Literal: doubleToken},
-            '!=': {Type: tokenPool.NOT_EQ, Literal: doubleToken},
+            '==': {type: tokenPool.EQ, literal: doubleToken},
+            '!=': {type: tokenPool.NOT_EQ, literal: doubleToken},
         }[doubleToken];
 
         if (!nextToken) {
-            return {Type: preType, Literal: lexerState.cursorChar as string};
+            return {type: preType, literal: lexerState.cursorChar as string};
         }
 
         readChar();
@@ -67,34 +67,34 @@ export function createLexer() {
 
         if (lexerState.cursorChar === null) {
             readChar();
-            return {Type: tokenPool.EOF, Literal: ''};
+            return {type: tokenPool.EOF, literal: ''};
         }
 
         if (isLetter(lexerState.cursorChar)) {
             const identifier = readUntil(isLetter);
-            return {Type: lookupIdent(identifier), Literal: identifier};
+            return {type: lookupIdent(identifier), literal: identifier};
         }
 
         if (isDigit(lexerState.cursorChar)) {
             const digitToken = readUntil(isDigit);
-            return {Type: tokenPool.INT, Literal: digitToken};
+            return {type: tokenPool.INT, literal: digitToken};
         }
 
         const tok: Ttoken | undefined = {
             '=': readDoubleToken(tokenPool.ASSIGN),
-            ';': {Type: tokenPool.SEMICOLON, Literal: lexerState.cursorChar},
-            '(': {Type: tokenPool.LPAREN, Literal: lexerState.cursorChar},
-            ')': {Type: tokenPool.RPAREN, Literal: lexerState.cursorChar},
-            ',': {Type: tokenPool.COMMA, Literal: lexerState.cursorChar},
-            '+': {Type: tokenPool.PLUS, Literal: lexerState.cursorChar},
-            '-': {Type: tokenPool.MINUS, Literal: lexerState.cursorChar},
+            ';': {type: tokenPool.SEMICOLON, literal: lexerState.cursorChar},
+            '(': {type: tokenPool.LPAREN, literal: lexerState.cursorChar},
+            ')': {type: tokenPool.RPAREN, literal: lexerState.cursorChar},
+            ',': {type: tokenPool.COMMA, literal: lexerState.cursorChar},
+            '+': {type: tokenPool.PLUS, literal: lexerState.cursorChar},
+            '-': {type: tokenPool.MINUS, literal: lexerState.cursorChar},
             '!': readDoubleToken(tokenPool.BANG),
-            '/': {Type: tokenPool.SLASH, Literal: lexerState.cursorChar},
-            '*': {Type: tokenPool.ASTERISK, Literal: lexerState.cursorChar},
-            '<': {Type: tokenPool.LT, Literal: lexerState.cursorChar},
-            '>': {Type: tokenPool.GT, Literal: lexerState.cursorChar},
-            '{': {Type: tokenPool.LBRACE, Literal: lexerState.cursorChar},
-            '}': {Type: tokenPool.RBRACE, Literal: lexerState.cursorChar},
+            '/': {type: tokenPool.SLASH, literal: lexerState.cursorChar},
+            '*': {type: tokenPool.ASTERISK, literal: lexerState.cursorChar},
+            '<': {type: tokenPool.LT, literal: lexerState.cursorChar},
+            '>': {type: tokenPool.GT, literal: lexerState.cursorChar},
+            '{': {type: tokenPool.LBRACE, literal: lexerState.cursorChar},
+            '}': {type: tokenPool.RBRACE, literal: lexerState.cursorChar},
         }[lexerState.cursorChar];
         readChar();
 

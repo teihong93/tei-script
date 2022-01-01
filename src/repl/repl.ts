@@ -1,6 +1,5 @@
-import {ReadLine, createInterface} from 'readline';
+import {createInterface} from 'readline';
 import {createLexer} from '../lexer/lexter';
-import {expect} from 'chai';
 import tokenPool from '../token/tokenPool';
 
 let rl = createInterface({
@@ -19,7 +18,7 @@ export function runRepl() {
                     break;
                 default:
                     const lexer = createLexer().init({input: answer});
-                    for (let t = lexer.nextToken(); t.Type != tokenPool.EOF; t = lexer.nextToken()) {
+                    for (let t = lexer.nextToken(); t.type != tokenPool.EOF; t = lexer.nextToken()) {
                         console.log(t);
                     }
                     query();
