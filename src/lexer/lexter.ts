@@ -1,4 +1,4 @@
-import {TlexerInput, TlexerState} from '../types/lexer';
+import {TlexerInput, TlexerOutput, TlexerState} from '../types/lexer';
 import {Ttoken} from '../types/token';
 import tokenPool from '../token/tokenPool';
 import {isDigit, isLetter} from '../util/charUtil';
@@ -12,7 +12,7 @@ export function createLexer() {
         cursorChar: '',
     };
 
-    const init = (lexerInput: TlexerInput) => {
+    const init = (lexerInput: TlexerInput): TlexerOutput => {
         const {input} = lexerInput;
         lexerState.input = input;
         readChar();
