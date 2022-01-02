@@ -1,7 +1,10 @@
 import {TParserInput, TParserOutput, TParserState} from '../types/parser';
-import {TProgramOutput, TStatementOutput} from '../types/ast';
+import {TProgramOutput, TStatementOutput, TTokenBase} from '../types/ast';
 import {createProgram} from '../ast/program';
 import tokenPool from '../token/tokenPool';
+import {createLetStatement} from '../ast/letStatement';
+import {Ttoken} from '../types/token';
+import {createIdentifier} from '../ast/identifier';
 
 export function createParser() {
     let parserState: TParserState = {
@@ -29,13 +32,60 @@ export function createParser() {
         parserState.nextToken = parserState.lexer.nextToken();
     };
 
+    const expectNext = (t: Ttoken['type']) => {
+        if (nextTokenIs(t)) {
+            nextToken();
+            return true;
+        }
+        return false;
+    };
+
+    const currentTokenIs = (t: Ttoken['type']) => {
+        return parserState.currentToken?.type === t;
+    };
+
+    const nextTokenIs = (t: Ttoken['type']) => {
+        return parserState.nextToken?.type === t;
+    };
+
     const parseStatement = (): TStatementOutput | undefined => {
         switch (parserState.currentToken?.type) {
             case tokenPool.LET :
-                return parseStatement();
+                return parseLetStatement();
             default:
                 return;
         }
+    };
+
+    /*
+    * let a = 3; 같은 토큰을 파싱하기때문에, let 문 다음으로
+    * a 와 같은 식별자가 와야 하고, 그다음 = 과 같은 대입문이 와야 한다.
+    */
+    const parseLetStatement = () => {
+        if (!parserState.currentToken) return;
+        const {currentToken} = parserState;
+
+        if (!expectNext(tokenPool.IDENT)) {
+            return;
+        }
+
+        const identifier = createIdentifier(currentToken).init({
+            value: currentToken.literal,
+        });
+
+        const statement = createLetStatement(currentToken).init({
+            name: identifier,
+        });
+
+        if (!expectNext(tokenPool.ASSIGN)) {
+            return;
+        }
+
+        //TODO 세미콜론을 만날때 까지 표현식을 건너뛴다.
+        while (!currentTokenIs(tokenPool.SEMICOLON)) {
+            nextToken();
+        }
+        return statement;
     };
 
     const parseProgram = (): TProgramOutput => {
@@ -51,7 +101,6 @@ export function createParser() {
             }
             nextToken();
         }
-
         return program;
     };
 
