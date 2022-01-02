@@ -11,6 +11,7 @@ export function createParser() {
         lexer: undefined,
         currentToken: undefined,
         nextToken: undefined,
+        errors: [],
     };
 
     const init = (parserInput: TParserInput): TParserOutput => {
@@ -23,6 +24,7 @@ export function createParser() {
 
         return {
             parseProgram,
+            errors: () => [...(parserState.errors)],
         };
     };
 
@@ -37,6 +39,7 @@ export function createParser() {
             nextToken();
             return true;
         }
+        nextTokenError(t);
         return false;
     };
 
@@ -57,6 +60,10 @@ export function createParser() {
         }
     };
 
+    const nextTokenError = (expected: string) => {
+        parserState.errors.push(`다음토큰은 ${expected} 를 예상했지만 ${parserState.nextToken?.type} 가 옴`);
+    };
+
     /*
     * let a = 3; 같은 토큰을 파싱하기때문에, let 문 다음으로
     * a 와 같은 식별자가 와야 하고, 그다음 = 과 같은 대입문이 와야 한다.
@@ -67,6 +74,7 @@ export function createParser() {
 
         if (!expectNext(tokenPool.IDENT)) {
             return;
+            // throw nextTokenError(tokenPool.IDENT, parserState.nextToken?.type);
         }
 
         const identifier = createIdentifier(currentToken).init({
@@ -79,6 +87,7 @@ export function createParser() {
 
         if (!expectNext(tokenPool.ASSIGN)) {
             return;
+            // throw nextTokenError(tokenPool.ASSIGN, parserState.nextToken?.type);
         }
 
         //TODO 세미콜론을 만날때 까지 표현식을 건너뛴다.

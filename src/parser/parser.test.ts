@@ -1,14 +1,25 @@
-import {expect, should} from 'chai';
+import {expect, assert} from 'chai';
 import {TLetStatementState, TStatementOutput} from '../types/ast';
 import {createLexer} from '../lexer/lexter';
 import {createParser} from './parser';
+import {TParserOutput} from '../types/parser';
 
 it('파서 LET 테스트', () => {
 
     const testLetStatement = (statement: TStatementOutput, name: string) => {
+        console.log(statement);
         expect(statement.tokenLiteral()).to.equal('let');
         expect(statement.getStatement().name?.value, name);
         expect(statement.getStatement().name?.tokenLiteral(), name);
+    };
+
+    const checkParserErrors = (parser: TParserOutput) => {
+        const errors = parser.errors();
+        if (errors.length === 0) {
+            return;
+        }
+        const errMsg = errors.reduce((acc, e) => (acc + `\nerr: ${e}\n`),'');
+        assert.fail(`\n파서에서 ${errors.length} 개의 에러 발견 ${errMsg}`);
     };
 
     const input = `
@@ -21,6 +32,7 @@ it('파서 LET 테스트', () => {
     const parser = createParser().init({lexer: lexer});
 
     const program = parser.parseProgram();
+    checkParserErrors(parser);
     expect(program).exist;
     expect(program.statements.length).to.equal(3);
 

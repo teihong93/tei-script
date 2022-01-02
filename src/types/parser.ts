@@ -14,10 +14,13 @@ export type TParserState = {
     currentToken: Ttoken | undefined,
     /* 다음 읽을 토큰 */
     nextToken: Ttoken | undefined,
+    /* 파싱 에러 메시지 목록 */
+    errors: string[]
 }
 
 /* parser 인스턴스가 제공해야 할 공개 함수들*/
 export type TParserOutput = {
-    parseProgram: () => TProgramOutput
+    parseProgram: () => TProgramOutput,
+    errors: () => string[]
 }
 
