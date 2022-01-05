@@ -1,22 +1,25 @@
-import {TLetStatementState, TLetStatementStateInput, TStatementOutput} from '../types/ast';
+import {IExpression, TIdentifier, TLetStatementStateInput, TStatement} from '../types/ast';
 import {getTokenLiteral} from './getTokenLiteral';
 import {Ttoken} from '../types/token';
 
-export function createLetStatement(token: Ttoken) {
-    let letStatementState: TLetStatementState = {
-        name: undefined,
-        value: undefined,
-        token: token,
-    };
+export function LetStatement(token: Ttoken) {
 
-    const init = (input: TLetStatementStateInput): TStatementOutput => {
-        const {name, value} = input;
-        letStatementState.name = name;
-        letStatementState.value = value;
+
+    let name: TIdentifier | undefined;
+    /* 값을 생성하는 표현식 */
+    let value: IExpression | undefined;
+
+    const init = (input: TLetStatementStateInput): TStatement => {
+        name = input.name;
+        value = input.value;
         return {
             tokenLiteral,
             statementNode,
-            getStatement: () => letStatementState,
+            getStatement: () => ({
+                name: name as TIdentifier,
+                value: value,
+                token,
+            }),
         };
     };
 
@@ -24,7 +27,7 @@ export function createLetStatement(token: Ttoken) {
 
     };
 
-    const tokenLiteral = () => getTokenLiteral(letStatementState);
+    const tokenLiteral = () => getTokenLiteral({token});
     return {
         init,
     };

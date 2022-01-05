@@ -1,28 +1,26 @@
 import {
     TProgramInput,
-    TProgramOutput,
-    TProgramState,
+    TProgram,
+    TStatement,
 } from '../types/ast';
 
-export function createProgram() {
-    let programState: TProgramState = {
-        statements: [],
-    };
+export function Program() {
+
+    let statements: TStatement[] = [];
 
     const tokenLiteral = (): string => {
-        if (programState.statements.length > 0) {
-            return programState.statements[0].tokenLiteral();
+        if (statements.length > 0) {
+            return statements[0].tokenLiteral();
         } else {
             return '';
         }
     };
 
-    const init = (programInput: TProgramInput): TProgramOutput => {
-        const {statements} = programInput;
-        programState.statements = statements;
+    const init = (programInput: TProgramInput): TProgram => {
+        statements = programInput.statements;
         return {
             tokenLiteral,
-            statements: programState.statements,
+            statements: statements,
         };
     };
 

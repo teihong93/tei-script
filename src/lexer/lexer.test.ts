@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {Ttoken} from '../types/token';
 import tokenPool from '../token/tokenPool';
-import {createLexer} from './lexter';
+import {Lexer} from './lexter';
 
 it('토큰 테스트', () => {
     const input = '=+(){},;';
@@ -17,7 +17,7 @@ it('토큰 테스트', () => {
         {type: tokenPool.EOF, literal: ''},
     ];
 
-    const lexer = createLexer().init({input: input});
+    const lexer = Lexer().init({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
         expect(currentToken.type).to.equal(testToken.type);
@@ -126,10 +126,9 @@ it('코드 형태 데이터에 대한 lexer 테스트', () => {
         {type: tokenPool.EOF, literal: ''},
     ];
 
-    const lexer = createLexer().init({input: input});
+    const lexer = Lexer().init({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
-        console.log(currentToken);
         expect(currentToken.type).to.equal(testToken.type);
         expect(currentToken.literal).to.equal(testToken.literal);
     }

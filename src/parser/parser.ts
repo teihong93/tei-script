@@ -1,42 +1,41 @@
-import {TParserInput, TParserOutput, TParserState} from '../types/parser';
-import {TProgramOutput, TStatementOutput, TTokenBase} from '../types/ast';
-import {createProgram} from '../ast/program';
+import {TParserInput, TParser} from '../types/parser';
+import {TProgram, TStatement} from '../types/ast';
+import {Program} from '../ast/program';
 import tokenPool from '../token/tokenPool';
-import {createLetStatement} from '../ast/letStatement';
+import {LetStatement} from '../ast/letStatement';
 import {Ttoken} from '../types/token';
 import {createIdentifier} from '../ast/identifier';
+import {Tlexer} from '../types/lexer';
 
-export function createParser() {
-    let parserState: TParserState = {
-        lexer: undefined,
-        currentToken: undefined,
-        nextToken: undefined,
-        errors: [],
-    };
+export function Parser() {
 
-    const init = (parserInput: TParserInput): TParserOutput => {
-        const {lexer} = parserInput;
-        parserState.lexer = lexer;
+    let lexer: Tlexer | undefined;    /* 렉서의 인스턴스 */
+    let currentToken: Ttoken | undefined;        /* 현재 토큰 */
+    let nextToken: Ttoken | undefined;        /* 다음 읽을 토큰 */
+    let errors: string[] = [];        /* 파싱 에러 메시지 목록 */
+
+    const init = (parserInput: TParserInput): TParser => {
+        lexer = parserInput.lexer;
 
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
-        nextToken();
-        nextToken();
+        getNextToken();
+        getNextToken();
 
         return {
             parseProgram,
-            errors: () => [...(parserState.errors)],
+            errors: () => [...(errors)],
         };
     };
 
-    const nextToken = () => {
-        if (parserState.lexer === undefined) throw new Error('lexer 가 초기화되지 않음.');
-        parserState.currentToken = parserState.nextToken;
-        parserState.nextToken = parserState.lexer.nextToken();
+    const getNextToken = () => {
+        if (lexer === undefined) throw new Error('lexer 가 초기화되지 않음.');
+        currentToken = nextToken;
+        nextToken = lexer.nextToken();
     };
 
     const expectNext = (t: Ttoken['type']) => {
         if (nextTokenIs(t)) {
-            nextToken();
+            getNextToken();
             return true;
         }
         nextTokenError(t);
@@ -44,15 +43,15 @@ export function createParser() {
     };
 
     const currentTokenIs = (t: Ttoken['type']) => {
-        return parserState.currentToken?.type === t;
+        return currentToken?.type === t;
     };
 
     const nextTokenIs = (t: Ttoken['type']) => {
-        return parserState.nextToken?.type === t;
+        return nextToken?.type === t;
     };
 
-    const parseStatement = (): TStatementOutput | undefined => {
-        switch (parserState.currentToken?.type) {
+    const parseStatement = (): TStatement | undefined => {
+        switch (currentToken?.type) {
             case tokenPool.LET :
                 return parseLetStatement();
             default:
@@ -61,7 +60,7 @@ export function createParser() {
     };
 
     const nextTokenError = (expected: string) => {
-        parserState.errors.push(`다음토큰은 ${expected} 를 예상했지만 ${parserState.nextToken?.type} 가 옴`);
+        errors.push(`다음토큰은 ${expected} 를 예상했지만 ${nextToken?.type} 가 옴`);
     };
 
     /*
@@ -69,46 +68,45 @@ export function createParser() {
     * a 와 같은 식별자가 와야 하고, 그다음 = 과 같은 대입문이 와야 한다.
     */
     const parseLetStatement = () => {
-        if (!parserState.currentToken) return;
-        const {currentToken} = parserState;
+        if (!currentToken) return;
+
+        let nowCurrentToken = currentToken;
 
         if (!expectNext(tokenPool.IDENT)) {
             return;
-            // throw nextTokenError(tokenPool.IDENT, parserState.nextToken?.type);
         }
 
-        const identifier = createIdentifier(currentToken).init({
-            value: currentToken.literal,
+        const identifier = createIdentifier(nowCurrentToken).init({
+            value: nowCurrentToken.literal,
         });
 
-        const statement = createLetStatement(currentToken).init({
+        const statement = LetStatement(nowCurrentToken).init({
             name: identifier,
         });
 
         if (!expectNext(tokenPool.ASSIGN)) {
             return;
-            // throw nextTokenError(tokenPool.ASSIGN, parserState.nextToken?.type);
         }
 
         //TODO 세미콜론을 만날때 까지 표현식을 건너뛴다.
         while (!currentTokenIs(tokenPool.SEMICOLON)) {
-            nextToken();
+            getNextToken();
         }
         return statement;
     };
 
-    const parseProgram = (): TProgramOutput => {
-        if (parserState.currentToken === undefined || parserState.nextToken === undefined)
+    const parseProgram = (): TProgram => {
+        if (currentToken === undefined || nextToken === undefined)
             throw new Error('토큰이 초기화되지 않음.');
 
-        const program = createProgram().init({statements: []});
+        const program = Program().init({statements: []});
 
-        while (parserState.currentToken.type != tokenPool.EOF) {
+        while (currentToken.type != tokenPool.EOF) {
             const statement = parseStatement();
             if (statement) {
                 program.statements = [...program.statements, statement];
             }
-            nextToken();
+            getNextToken();
         }
         return program;
     };
