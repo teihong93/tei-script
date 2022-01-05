@@ -4,19 +4,14 @@ import tokenPool from '../token/tokenPool';
 import {isDigit, isLetter} from '../util/charUtil';
 import {lookupIdent} from '../token/keywords';
 
-export function Lexer() {
-    let input: string;
+export function Lexer(lexerInput: TlexerInput): Tlexer {
+    let input: string = lexerInput.input;
     let cursor: number = 0;     /* 렉서의 현재 커서 */
     let nextCursor: number = 0;     /* 렉서의 다음 커서 */
     let cursorChar: string | null;    /* 현재 커서가 가르키는 문자 , 마지막까지 읽었으면 null */
 
-    const init = (lexerInput: TlexerInput): Tlexer => {
-        input = lexerInput.input;
+    const init = () => {
         readChar();
-
-        return {
-            nextToken,
-        };
     };
 
     const readChar = () => {
@@ -101,7 +96,8 @@ export function Lexer() {
         return tok;
     };
 
+    init();
     return {
-        init,
+        nextToken,
     };
 }

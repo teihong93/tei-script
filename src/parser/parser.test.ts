@@ -27,7 +27,7 @@ it('파서 LET 테스트', () => {
         let foobar = 838383;
     `;
 
-    const lexer = Lexer().init({input: input});
+    const lexer = Lexer({input: input});
     const parser = Parser().init({lexer: lexer});
 
     const program = parser.parseProgram();

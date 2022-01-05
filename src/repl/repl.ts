@@ -17,7 +17,7 @@ export function runRepl() {
                     rl.close();
                     break;
                 default:
-                    const lexer = Lexer().init({input: answer});
+                    const lexer = Lexer({input: answer});
                     for (let t = lexer.nextToken(); t.type != tokenPool.EOF; t = lexer.nextToken()) {
                         console.log(t);
                     }

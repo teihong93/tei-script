@@ -17,7 +17,7 @@ it('토큰 테스트', () => {
         {type: tokenPool.EOF, literal: ''},
     ];
 
-    const lexer = Lexer().init({input: input});
+    const lexer = Lexer({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
         expect(currentToken.type).to.equal(testToken.type);
@@ -126,7 +126,7 @@ it('코드 형태 데이터에 대한 lexer 테스트', () => {
         {type: tokenPool.EOF, literal: ''},
     ];
 
-    const lexer = Lexer().init({input: input});
+    const lexer = Lexer({input: input});
     for (let testToken of tokenTestCase) {
         const currentToken = lexer.nextToken();
         expect(currentToken.type).to.equal(testToken.type);
