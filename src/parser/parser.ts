@@ -7,24 +7,17 @@ import {Ttoken} from '../types/token';
 import {createIdentifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
 
-export function Parser() {
+export function Parser(parserInput: TParserInput): TParser {
 
-    let lexer: Tlexer | undefined;    /* 렉서의 인스턴스 */
+    let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
     let currentToken: Ttoken | undefined;        /* 현재 토큰 */
     let nextToken: Ttoken | undefined;        /* 다음 읽을 토큰 */
     let errors: string[] = [];        /* 파싱 에러 메시지 목록 */
 
-    const init = (parserInput: TParserInput): TParser => {
-        lexer = parserInput.lexer;
-
+    const init = () => {
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
         getNextToken();
         getNextToken();
-
-        return {
-            parseProgram,
-            errors: () => [...(errors)],
-        };
     };
 
     const getNextToken = () => {
@@ -72,9 +65,7 @@ export function Parser() {
 
         let nowCurrentToken = currentToken;
 
-        if (!expectNext(tokenPool.IDENT)) {
-            return;
-        }
+        if (!expectNext(tokenPool.IDENT)) return;
 
         const identifier = createIdentifier(nowCurrentToken).init({
             value: nowCurrentToken.literal,
@@ -84,9 +75,7 @@ export function Parser() {
             name: identifier,
         });
 
-        if (!expectNext(tokenPool.ASSIGN)) {
-            return;
-        }
+        if (!expectNext(tokenPool.ASSIGN)) return;
 
         //TODO 세미콜론을 만날때 까지 표현식을 건너뛴다.
         while (!currentTokenIs(tokenPool.SEMICOLON)) {
@@ -111,7 +100,9 @@ export function Parser() {
         return program;
     };
 
+    init();
     return {
-        init,
+        parseProgram,
+        errors: () => [...(errors)],
     };
 }

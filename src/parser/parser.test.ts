@@ -28,7 +28,7 @@ it('파서 LET 테스트', () => {
     `;
 
     const lexer = Lexer({input: input});
-    const parser = Parser().init({lexer: lexer});
+    const parser = Parser({lexer: lexer});
 
     const program = parser.parseProgram();
     checkParserErrors(parser);
