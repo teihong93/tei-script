@@ -4,9 +4,8 @@ import {
     TStatement,
 } from '../types/ast';
 
-export function Program() {
-
-    let statements: TStatement[] = [];
+export function Program(programInput: TProgramInput): TProgram {
+    let statements: TStatement[] = programInput.statements;
 
     const tokenLiteral = (): string => {
         if (statements.length > 0) {
@@ -16,16 +15,9 @@ export function Program() {
         }
     };
 
-    const init = (programInput: TProgramInput): TProgram => {
-        statements = programInput.statements;
-        return {
-            tokenLiteral,
-            statements: statements,
-        };
-    };
-
     return {
-        init,
+        tokenLiteral,
+        statements: statements,
     };
 }
 

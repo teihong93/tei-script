@@ -99,7 +99,7 @@ export function Parser() {
         if (currentToken === undefined || nextToken === undefined)
             throw new Error('토큰이 초기화되지 않음.');
 
-        const program = Program().init({statements: []});
+        const program = Program({statements: []});
 
         while (currentToken.type != tokenPool.EOF) {
             const statement = parseStatement();
