@@ -2,24 +2,16 @@ import {TIdentifierInput, TIdentifier} from '../types/ast';
 import {getTokenLiteral} from './getTokenLiteral';
 import {Ttoken} from '../types/token';
 
-export function createIdentifier(token: Ttoken) {
+export function Identifier(input: TIdentifierInput): TIdentifier {
 
-    let value:string = ""
+    let value:string = input.value;
 
-    const init = (input: TIdentifierInput): TIdentifier => {
-        value = input.value;
-        return {
-            tokenLiteral,
-            value: value,
-            token: token,
-        };
-    };
-    const expressionNode = () => {
+    const expressionNode = () => {};
 
-    };
-
-    const tokenLiteral = () => getTokenLiteral({token});
+    const tokenLiteral = () => getTokenLiteral({token:input.token});
     return {
-        init,
+        tokenLiteral,
+        value: value,
+        token: input.token,
     };
 }

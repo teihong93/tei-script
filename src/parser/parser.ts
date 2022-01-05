@@ -4,7 +4,7 @@ import {Program} from '../ast/program';
 import tokenPool from '../token/tokenPool';
 import {LetStatement} from '../ast/letStatement';
 import {Ttoken} from '../types/token';
-import {createIdentifier} from '../ast/identifier';
+import {Identifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
 
 export function Parser(parserInput: TParserInput): TParser {
@@ -67,11 +67,13 @@ export function Parser(parserInput: TParserInput): TParser {
 
         if (!expectNext(tokenPool.IDENT)) return;
 
-        const identifier = createIdentifier(nowCurrentToken).init({
+        const identifier = Identifier({
+            token: nowCurrentToken,
             value: nowCurrentToken.literal,
         });
 
-        const statement = LetStatement(nowCurrentToken).init({
+        const statement = LetStatement({
+            token: nowCurrentToken,
             name: identifier,
         });
 
