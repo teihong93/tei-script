@@ -1,6 +1,5 @@
-import {TStatement} from '../types/ast/ast';
 import {getTokenLiteral} from './getTokenLiteral';
-import {TLetStatement, TLetStatementInput} from '../types/ast/letState';
+import {TLetStatement, TLetStatementInput} from '../types/ast/letStatement';
 import {TIdentifier} from '../types/ast/identifier';
 import {TExpression} from '../types/ast/expression';
 
@@ -12,11 +11,17 @@ export function LetStatement(input: TLetStatementInput): TLetStatement {
     const statementNode = () => {};
 
     const tokenLiteral = () => getTokenLiteral({token: input.token});
+
+    const string = () => {
+        return `${tokenLiteral()} ${name.string()} = ${value ? value.string() :''};`
+    }
+
     return {
         tokenLiteral,
         statementNode,
         name,
         value,
-        token:input.token
+        token:input.token,
+        string
     };
 }

@@ -7,7 +7,7 @@ import {Ttoken} from '../types/token';
 import {Identifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
 import {ReturnStatement} from '../ast/returnStatement';
-import {TReturnStatement} from '../types/ast/returnState';
+import {TReturnStatement} from '../types/ast/returnStatement';
 import {TProgram} from '../types/ast/program';
 
 export function Parser(parserInput: TParserInput): TParser {

@@ -3,7 +3,7 @@ import {TStatement} from '../types/ast/ast';
 import {Lexer} from '../lexer/lexter';
 import {Parser} from './parser';
 import {TParser} from '../types/parser';
-import {TLetStatement} from '../types/ast/letState';
+import {TLetStatement} from '../types/ast/letStatement';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();

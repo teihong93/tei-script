@@ -2,6 +2,7 @@ import {Ttoken} from '../token';
 
 export interface INode {
     tokenLiteral: () => string;
+    string: () => string;
 }
 
 export type TTokenBase = {
