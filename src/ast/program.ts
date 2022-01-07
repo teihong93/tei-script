@@ -1,11 +1,10 @@
 import {
-    TProgramInput,
-    TProgram,
     TStatement,
-} from '../types/ast';
+} from '../types/ast/ast';
+import {TProgram, TProgramInput} from '../types/ast/program';
 
 export function Program(programInput: TProgramInput): TProgram {
-    let statements: TStatement[] = programInput.statements;
+    let statements = programInput.statements;
 
     const tokenLiteral = (): string => {
         if (statements.length > 0) {

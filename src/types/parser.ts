@@ -1,6 +1,6 @@
 import {Tlexer} from './lexer';
 import {Ttoken} from './token';
-import {TProgram} from './ast';
+import {TProgram} from './ast/program';
 
 export type TParserInput = {
     /* 렉서의 인스턴스 */

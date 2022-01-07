@@ -1,6 +1,7 @@
-import {TIdentifierInput, TIdentifier} from '../types/ast';
+
 import {getTokenLiteral} from './getTokenLiteral';
 import {Ttoken} from '../types/token';
+import {TIdentifier, TIdentifierInput} from '../types/ast/identifier';
 
 export function Identifier(input: TIdentifierInput): TIdentifier {
 

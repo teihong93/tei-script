@@ -1,11 +1,14 @@
 import {TParserInput, TParser} from '../types/parser';
-import {TProgram, TStatement} from '../types/ast';
+import {TStatement} from '../types/ast/ast';
 import {Program} from '../ast/program';
 import tokenPool from '../token/tokenPool';
 import {LetStatement} from '../ast/letStatement';
 import {Ttoken} from '../types/token';
 import {Identifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
+import {ReturnStatement} from '../ast/returnStatement';
+import {TReturnStatement} from '../types/ast/returnState';
+import {TProgram} from '../types/ast/program';
 
 export function Parser(parserInput: TParserInput): TParser {
 
@@ -47,6 +50,8 @@ export function Parser(parserInput: TParserInput): TParser {
         switch (currentToken?.type) {
             case tokenPool.LET :
                 return parseLetStatement();
+            case tokenPool.RETURN :
+                return parseReturnStatement();
             default:
                 return;
         }
@@ -84,6 +89,18 @@ export function Parser(parserInput: TParserInput): TParser {
             getNextToken();
         }
         return statement;
+    };
+
+    const parseReturnStatement = () => {
+        if (!currentToken) return;
+
+        const statememt = ReturnStatement({token: currentToken});
+        getNextToken();
+
+        while (!currentTokenIs(tokenPool.SEMICOLON)) {
+            getNextToken();
+        }
+        return statememt;
     };
 
     const parseProgram = (): TProgram => {

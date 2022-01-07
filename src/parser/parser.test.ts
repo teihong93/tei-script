@@ -1,24 +1,25 @@
 import {expect, assert} from 'chai';
-import {TStatement} from '../types/ast';
+import {TStatement} from '../types/ast/ast';
 import {Lexer} from '../lexer/lexter';
 import {Parser} from './parser';
 import {TParser} from '../types/parser';
+import {TLetStatement} from '../types/ast/letState';
+
+const checkParserErrors = (parser: TParser) => {
+    const errors = parser.errors();
+    if (errors.length === 0) {
+        return;
+    }
+    const errMsg = errors.reduce((acc, e) => (acc + `\nerr: ${e}\n`), '');
+    assert.fail(`\n파서에서 ${errors.length} 개의 에러 발견 ${errMsg}`);
+};
 
 it('파서 LET 테스트', () => {
 
-    const testLetStatement = (statement: TStatement, name: string) => {
+    const testLetStatement = (statement: TLetStatement, name: string) => {
         expect(statement.tokenLiteral()).to.equal('let');
-        expect(statement.getStatement().name?.value, name);
-        expect(statement.getStatement().name?.tokenLiteral(), name);
-    };
-
-    const checkParserErrors = (parser: TParser) => {
-        const errors = parser.errors();
-        if (errors.length === 0) {
-            return;
-        }
-        const errMsg = errors.reduce((acc, e) => (acc + `\nerr: ${e}\n`), '');
-        assert.fail(`\n파서에서 ${errors.length} 개의 에러 발견 ${errMsg}`);
+        expect(statement.name.value, name);
+        expect(statement.name?.tokenLiteral(), name);
     };
 
     const input = `
@@ -43,7 +44,29 @@ it('파서 LET 테스트', () => {
 
     for (let testIdx in tests) {
         const stmt = program.statements[testIdx];
-        testLetStatement(stmt, tests[testIdx].expectedIdentifier);
+        testLetStatement(stmt as TLetStatement, tests[testIdx].expectedIdentifier);
+    }
+
+});
+
+it('파서 RETURN 테스트', () => {
+
+    const input = `
+        return 5;
+        return 10;
+        return 99332421;
+    `;
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+    expect(program).exist;
+    expect(program.statements.length).to.equal(3);
+
+    for(let test of program.statements){
+        expect(test.tokenLiteral()).to.equal("return");
     }
 
 });
