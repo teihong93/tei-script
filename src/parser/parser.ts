@@ -1,26 +1,32 @@
-import {TParserInput, TParser} from '../types/parser';
+import {TParserInput, TParser, TPrefixParseFns, TinfixParseFns} from '../types/parser';
 import {TStatement} from '../types/ast/ast';
 import {Program} from '../ast/program';
 import tokenPool from '../token/tokenPool';
 import {LetStatement} from '../ast/letStatement';
-import {Ttoken} from '../types/token';
+import {Ttoken, TtokenType} from '../types/token';
 import {Identifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
 import {ReturnStatement} from '../ast/returnStatement';
-import {TReturnStatement} from '../types/ast/returnStatement';
 import {TProgram} from '../types/ast/program';
+import {ParseFns} from './parseFns';
+import {ExpressionStatement} from '../ast/expressionStatement';
+import {precedences} from './precedences';
+import {TExpression} from '../types/ast/expression';
 
 export function Parser(parserInput: TParserInput): TParser {
-
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
     let currentToken: Ttoken | undefined;        /* 현재 토큰 */
     let nextToken: Ttoken | undefined;        /* 다음 읽을 토큰 */
     let errors: string[] = [];        /* 파싱 에러 메시지 목록 */
 
+    /* 프랫파싱을위한 함수들 */
+    const {getInfixParseFns, getPrefixParseFns, registerPrefix, registerInfix} = ParseFns();
+
     const init = () => {
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
         getNextToken();
         getNextToken();
+        registerPrefix(tokenPool.IDENT, parseIdentifier)
     };
 
     const getNextToken = () => {
@@ -53,7 +59,7 @@ export function Parser(parserInput: TParserInput): TParser {
             case tokenPool.RETURN :
                 return parseReturnStatement();
             default:
-                return;
+                return parseExpressionStatement();
         }
     };
 
@@ -102,6 +108,34 @@ export function Parser(parserInput: TParserInput): TParser {
         }
         return statememt;
     };
+
+    const parseExpressionStatement = () => {
+        if (!currentToken) return;
+
+        const statement = ExpressionStatement({
+            token: currentToken,
+            expression: parseExpression(precedences.LOWEST),
+        });
+
+        if (nextTokenIs(tokenPool.SEMICOLON)) {
+            getNextToken();
+        }
+
+        return statement;
+    };
+
+    const parseExpression = (exp: precedences): TExpression | undefined => {
+        const prefix = getPrefixParseFns(currentToken?.type as string);
+        if (prefix) {
+            return prefix();
+        }
+        return;
+    };
+
+    const parseIdentifier = ():TExpression => {
+        if(!currentToken) throw new Error('토큰이 초기화되지 않음.')
+        return Identifier({token:currentToken,value:currentToken.literal})
+    }
 
     const parseProgram = (): TProgram => {
         if (currentToken === undefined || nextToken === undefined)

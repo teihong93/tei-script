@@ -1,6 +1,8 @@
 import {Tlexer} from './lexer';
-import {Ttoken} from './token';
+import {Ttoken, TtokenType} from './token';
 import {TProgram} from './ast/program';
+import {TExpression} from './ast/expression';
+import tokenPool from '../token/tokenPool';
 
 export type TParserInput = {
     /* 렉서의 인스턴스 */
@@ -13,3 +15,8 @@ export type TParser = {
     errors: () => string[]
 }
 
+export type TprefixParseFn = () => TExpression
+export type TinfixParseFn = (expression: TExpression) => TExpression
+
+export type TPrefixParseFns = Map<TtokenType,TprefixParseFn>
+export type TinfixParseFns = Map<TtokenType,TinfixParseFn>

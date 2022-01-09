@@ -4,6 +4,8 @@ import {Lexer} from '../lexer/lexter';
 import {Parser} from './parser';
 import {TParser} from '../types/parser';
 import {TLetStatement} from '../types/ast/letStatement';
+import {TExpressionStatement} from '../types/ast/expressionStatement';
+import {TIdentifier} from '../types/ast/identifier';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -65,8 +67,32 @@ it('파서 RETURN 테스트', () => {
     expect(program).exist;
     expect(program.statements.length).to.equal(3);
 
-    for(let test of program.statements){
-        expect(test.tokenLiteral()).to.equal("return");
+    for (let test of program.statements) {
+        expect(test.tokenLiteral()).to.equal('return');
     }
+
+});
+
+it('파서 식별자 Expression 테스트', () => {
+
+    const input = `foobar;`;
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+    expect(program).exist;
+    expect(program.statements.length).to.equal(1); //foobar 하나니까 1
+
+    const statement = program.statements[0] as TExpressionStatement
+
+    const ident = statement.expression as TIdentifier
+
+    console.log(ident)
+
+    expect(ident.value).to.equal('foobar');
+    expect(ident.tokenLiteral()).to.equal('foobar');
+
 
 });
