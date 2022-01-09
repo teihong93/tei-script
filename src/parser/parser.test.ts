@@ -16,7 +16,7 @@ const checkParserErrors = (parser: TParser) => {
     assert.fail(`\n파서에서 ${errors.length} 개의 에러 발견 ${errMsg}`);
 };
 
-it('파서 LET 테스트', () => {
+it('파서 LET 테스트(3)', () => {
 
     const testLetStatement = (statement: TLetStatement, name: string) => {
         expect(statement.tokenLiteral()).to.equal('let');
@@ -51,7 +51,7 @@ it('파서 LET 테스트', () => {
 
 });
 
-it('파서 RETURN 테스트', () => {
+it('파서 RETURN 테스트(4)', () => {
 
     const input = `
         return 5;
@@ -73,7 +73,7 @@ it('파서 RETURN 테스트', () => {
 
 });
 
-it('파서 식별자 Expression 테스트', () => {
+it('파서 식별자 Expression 테스트(6)', () => {
 
     const input = `foobar;`;
 
@@ -88,8 +88,6 @@ it('파서 식별자 Expression 테스트', () => {
     const statement = program.statements[0] as TExpressionStatement
 
     const ident = statement.expression as TIdentifier
-
-    console.log(ident)
 
     expect(ident.value).to.equal('foobar');
     expect(ident.tokenLiteral()).to.equal('foobar');

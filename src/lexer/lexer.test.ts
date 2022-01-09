@@ -3,7 +3,7 @@ import {Ttoken} from '../types/token';
 import tokenPool from '../token/tokenPool';
 import {Lexer} from './lexter';
 
-it('토큰 테스트', () => {
+it('토큰 테스트(1)', () => {
     const input = '=+(){},;';
     const tokenTestCase: Ttoken[] = [
         {type: tokenPool.ASSIGN, literal: '='},
@@ -25,7 +25,7 @@ it('토큰 테스트', () => {
     }
 });
 
-it('코드 형태 데이터에 대한 lexer 테스트', () => {
+it('코드 형태 데이터에 대한 lexer 테스트(2)', () => {
     const input = `
   let five = 5;
   let ten = 10;

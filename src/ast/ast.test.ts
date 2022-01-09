@@ -6,7 +6,7 @@ import {Program} from './program';
 import {LetStatement} from './letStatement';
 import {Identifier} from './identifier';
 
-it('string 함수 테스트', () => {
+it('string 함수 테스트(5)', () => {
 
     const program = Program({
         statements: [
