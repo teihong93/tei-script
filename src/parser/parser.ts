@@ -12,6 +12,7 @@ import {ParseFns} from './parseFns';
 import {ExpressionStatement} from '../ast/expressionStatement';
 import {precedences} from './precedences';
 import {TExpression} from '../types/ast/expression';
+import {IntegerLiteral} from '../ast/integerLiteral';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -26,7 +27,8 @@ export function Parser(parserInput: TParserInput): TParser {
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
         getNextToken();
         getNextToken();
-        registerPrefix(tokenPool.IDENT, parseIdentifier)
+        registerPrefix(tokenPool.IDENT, parseIdentifier); // 식별자 토큰 처리 함수 등록
+        registerPrefix(tokenPool.INT, parseIntegerLiteral); // 정수 리터럴 토큰 처리 함수 등록
     };
 
     const getNextToken = () => {
@@ -132,10 +134,16 @@ export function Parser(parserInput: TParserInput): TParser {
         return;
     };
 
-    const parseIdentifier = ():TExpression => {
-        if(!currentToken) throw new Error('토큰이 초기화되지 않음.')
-        return Identifier({token:currentToken,value:currentToken.literal})
-    }
+    const parseIdentifier = (): TExpression => {
+        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
+        return Identifier({token: currentToken, value: currentToken.literal});
+    };
+
+    const parseIntegerLiteral = (): TExpression => {
+        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
+        const literalNumber = parseInt(currentToken.literal);
+        return IntegerLiteral({token: currentToken, value: literalNumber});
+    };
 
     const parseProgram = (): TProgram => {
         if (currentToken === undefined || nextToken === undefined)
