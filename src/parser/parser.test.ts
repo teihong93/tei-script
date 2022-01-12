@@ -7,6 +7,8 @@ import {TLetStatement} from '../types/ast/letStatement';
 import {TExpressionStatement} from '../types/ast/expressionStatement';
 import {TIdentifier} from '../types/ast/identifier';
 import {TIntegerLiteral} from '../types/ast/integerLiteral';
+import {TPrefixExpression} from '../types/ast/prefixExpression';
+import {TExpression} from '../types/ast/expression';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -15,6 +17,12 @@ const checkParserErrors = (parser: TParser) => {
     }
     const errMsg = errors.reduce((acc, e) => (acc + `\nerr: ${e}\n`), '');
     assert.fail(`\n파서에서 ${errors.length} 개의 에러 발견 ${errMsg}`);
+};
+
+const testIntegerLiteral = (il: TExpression, value: number) => {
+    const integ = il as TIntegerLiteral;
+    expect(integ.value).to.equal(value);
+    expect(integ.tokenLiteral()).to.equal(`${value}`);
 };
 
 it('파서 LET 테스트(3)', () => {
@@ -114,5 +122,34 @@ it('파서 정수 리터럴 테스트(7)', () => {
 
     expect(literal.value).to.equal(5);
     expect(literal.tokenLiteral()).to.equal('5');
+
+});
+
+it('파서 전위 연산자 테스트(8)', () => {
+
+    const tests: {input: string, operator: string, value: number}[] = [
+        {input: '!5;', operator: '!', value: 5},
+        {input: '-15;', operator: '-', value: 15},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.statements.length).to.equal(1);
+
+        const statement = program.statements[0] as TExpressionStatement;
+
+        const exp = statement.expression as TPrefixExpression;
+
+        expect(exp.operator).to.equal(t.operator);
+        expect(exp.right).exist;
+        testIntegerLiteral(exp.right as TExpression,t.value)
+    }
+
 
 });

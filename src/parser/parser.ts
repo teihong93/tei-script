@@ -1,9 +1,9 @@
-import {TParserInput, TParser, TPrefixParseFns, TinfixParseFns} from '../types/parser';
+import {TParser, TParserInput} from '../types/parser';
 import {TStatement} from '../types/ast/ast';
 import {Program} from '../ast/program';
 import tokenPool from '../token/tokenPool';
 import {LetStatement} from '../ast/letStatement';
-import {Ttoken, TtokenType} from '../types/token';
+import {Ttoken} from '../types/token';
 import {Identifier} from '../ast/identifier';
 import {Tlexer} from '../types/lexer';
 import {ReturnStatement} from '../ast/returnStatement';
@@ -13,6 +13,7 @@ import {ExpressionStatement} from '../ast/expressionStatement';
 import {precedences} from './precedences';
 import {TExpression} from '../types/ast/expression';
 import {IntegerLiteral} from '../ast/integerLiteral';
+import {PrefixExpression} from '../ast/prefixExpression';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -29,6 +30,9 @@ export function Parser(parserInput: TParserInput): TParser {
         getNextToken();
         registerPrefix(tokenPool.IDENT, parseIdentifier); // 식별자 토큰 처리 함수 등록
         registerPrefix(tokenPool.INT, parseIntegerLiteral); // 정수 리터럴 토큰 처리 함수 등록
+        registerPrefix(tokenPool.BANG, parsePrefixExpression); // !전위연산자 처리 함수 등록
+        registerPrefix(tokenPool.MINUS, parsePrefixExpression); // -전위연산자 처리 함수 등록
+
     };
 
     const getNextToken = () => {
@@ -67,6 +71,10 @@ export function Parser(parserInput: TParserInput): TParser {
 
     const nextTokenError = (expected: string) => {
         errors.push(`다음토큰은 ${expected} 를 예상했지만 ${nextToken?.type} 가 옴`);
+    };
+
+    const noPrefixParseFnError = (tokenType: Ttoken['type']) => {
+        errors.push(`${tokenType} 를 위한 prefix 함수가 존재하지 않음`);
     };
 
     /*
@@ -127,11 +135,13 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseExpression = (exp: precedences): TExpression | undefined => {
-        const prefix = getPrefixParseFns(currentToken?.type as string);
-        if (prefix) {
-            return prefix();
+        if (!currentToken) return;
+        const prefix = getPrefixParseFns(currentToken.type);
+        if (!prefix) {
+            noPrefixParseFnError(currentToken.type);
+            return;
         }
-        return;
+        return prefix();
     };
 
     const parseIdentifier = (): TExpression => {
@@ -143,6 +153,19 @@ export function Parser(parserInput: TParserInput): TParser {
         if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
         const literalNumber = parseInt(currentToken.literal);
         return IntegerLiteral({token: currentToken, value: literalNumber});
+    };
+
+    const parsePrefixExpression = (): TExpression => {
+        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
+        const expression = PrefixExpression({
+            token: currentToken,
+            operator: currentToken.literal,
+        });
+
+        getNextToken();
+
+        expression.right = parseExpression(precedences.PREFIX);
+        return expression;
     };
 
     const parseProgram = (): TProgram => {
