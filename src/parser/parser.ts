@@ -10,10 +10,11 @@ import {ReturnStatement} from '../ast/returnStatement';
 import {TProgram} from '../types/ast/program';
 import {ParseFns} from './parseFns';
 import {ExpressionStatement} from '../ast/expressionStatement';
-import {precedences} from './precedences';
+import {Precedence, precedences} from './precedences';
 import {TExpression} from '../types/ast/expression';
 import {IntegerLiteral} from '../ast/integerLiteral';
 import {PrefixExpression} from '../ast/prefixExpression';
+import {InfixExpression} from '../ast/infixExpression';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -23,6 +24,7 @@ export function Parser(parserInput: TParserInput): TParser {
 
     /* 프랫파싱을위한 함수들 */
     const {getInfixParseFns, getPrefixParseFns, registerPrefix, registerInfix} = ParseFns();
+    const {getPrecedences} = Precedence();
 
     const init = () => {
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
@@ -33,6 +35,14 @@ export function Parser(parserInput: TParserInput): TParser {
         registerPrefix(tokenPool.BANG, parsePrefixExpression); // !전위연산자 처리 함수 등록
         registerPrefix(tokenPool.MINUS, parsePrefixExpression); // -전위연산자 처리 함수 등록
 
+        registerInfix(tokenPool.PLUS, parseInfixExpression); // + 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.MINUS, parseInfixExpression); // - 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.SLASH, parseInfixExpression); // / 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.ASTERISK, parseInfixExpression); // * 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.EQ, parseInfixExpression); // = 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.NOT_EQ, parseInfixExpression); // != 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.LT, parseInfixExpression); // < 중위연산자 처리 함수 등록
+        registerInfix(tokenPool.GT, parseInfixExpression); // > 중위연산자 처리 함수 등록
     };
 
     const getNextToken = () => {
@@ -134,14 +144,27 @@ export function Parser(parserInput: TParserInput): TParser {
         return statement;
     };
 
-    const parseExpression = (exp: precedences): TExpression | undefined => {
-        if (!currentToken) return;
+    const parseExpression = (precedence: precedences): TExpression | undefined => {
+        if (!currentToken || !nextToken) return;
+
         const prefix = getPrefixParseFns(currentToken.type);
         if (!prefix) {
             noPrefixParseFnError(currentToken.type);
             return;
         }
-        return prefix();
+
+        let leftExpression: TExpression = prefix();
+
+        while (!nextTokenIs(tokenPool.SEMICOLON) && precedence < getPrecedences(nextToken.type)) {
+            const infix = getInfixParseFns(nextToken.type);
+            if (!infix) {
+                return leftExpression;
+            }
+            getNextToken();
+            leftExpression = infix(leftExpression);
+        }
+
+        return leftExpression;
     };
 
     const parseIdentifier = (): TExpression => {
@@ -165,6 +188,21 @@ export function Parser(parserInput: TParserInput): TParser {
         getNextToken();
 
         expression.right = parseExpression(precedences.PREFIX);
+        return expression;
+    };
+
+    const parseInfixExpression = (left: TExpression): TExpression => {
+        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
+        const expression = InfixExpression({
+            token: currentToken,
+            operator: currentToken.literal,
+            left: left,
+        });
+
+        const currentPrecedence = getPrecedences(currentToken.type);
+        getNextToken();
+
+        expression.right = parseExpression(currentPrecedence);
         return expression;
     };
 

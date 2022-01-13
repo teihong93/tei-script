@@ -17,7 +17,7 @@ export function ExpressionStatement(input: TExpressionStatementInput): TExpressi
         tokenLiteral,
         statementNode,
         expression,
+        string,
         token: input.token,
-        string: string,
     };
 }

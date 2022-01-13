@@ -9,6 +9,7 @@ import {TIdentifier} from '../types/ast/identifier';
 import {TIntegerLiteral} from '../types/ast/integerLiteral';
 import {TPrefixExpression} from '../types/ast/prefixExpression';
 import {TExpression} from '../types/ast/expression';
+import {TInfixExpression} from '../types/ast/infixExpression';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -150,6 +151,39 @@ it('파서 전위 연산자 테스트(8)', () => {
         expect(exp.right).exist;
         testIntegerLiteral(exp.right as TExpression,t.value)
     }
+});
 
+it('파서 중위 연산자 테스트(9)', () => {
 
+    const tests: {input: string, operator: string, leftValue: number,rightValue:number}[] = [
+        {input: '5+5;', operator: '+', leftValue:5,rightValue:5},
+        {input: '5-5;', operator: '-', leftValue:5,rightValue:5},
+        {input: '5*5;', operator: '*', leftValue:5,rightValue:5},
+        {input: '5>5;', operator: '>', leftValue:5,rightValue:5},
+        {input: '5==5;', operator: '==', leftValue:5,rightValue:5},
+        {input: '5!=5;', operator: '!=', leftValue:5,rightValue:5},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.statements.length).to.equal(1);
+
+        const statement = program.statements[0] as TExpressionStatement;
+
+        const exp = statement.expression as TInfixExpression;
+
+        expect(exp.operator).to.equal(t.operator);
+        expect(exp.right).exist;
+        expect(exp.left).exist;
+
+        testIntegerLiteral(exp.left as TExpression,t.leftValue)
+        testIntegerLiteral(exp.right as TExpression,t.rightValue)
+
+    }
 });

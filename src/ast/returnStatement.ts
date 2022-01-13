@@ -18,8 +18,8 @@ export function ReturnStatement(input: TReturnStatementInput): TReturnStatement 
 
     return {
         tokenLiteral,
-        token: input.token,
         statementNode,
-        string
+        string,
+        token: input.token,
     };
 }

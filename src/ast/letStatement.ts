@@ -21,7 +21,7 @@ export function LetStatement(input: TLetStatementInput): TLetStatement {
         statementNode,
         name,
         value,
+        string,
         token:input.token,
-        string
     };
 }

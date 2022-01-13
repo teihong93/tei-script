@@ -5,16 +5,13 @@ export function Identifier(input: TIdentifierInput): TIdentifier {
 
     let value:string = input.value;
 
-    const expressionNode = () => {};
-
     const tokenLiteral = () => getTokenLiteral({token:input.token});
-
     const string = () => value
 
     return {
         tokenLiteral,
-        value: value,
+        value,
+        string,
         token: input.token,
-        string
     };
 }

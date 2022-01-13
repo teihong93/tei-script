@@ -20,7 +20,7 @@ export function Program(programInput: TProgramInput): TProgram {
 
     return {
         tokenLiteral,
-        statements: statements,
+        statements,
         string,
     };
 }
