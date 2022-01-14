@@ -8,13 +8,20 @@ export function PrefixExpression(input: TPrefixExpressionInput): TPrefixExpressi
     let right: TExpression | undefined = input.right;
 
     const tokenLiteral = () => getTokenLiteral({token: input.token});
-    const string = () => `(${input.operator}${input.right?.string()})`;
+    const string = () => {
+        return `(${operator}${right?.string()})`;
+    };
+
+    const insertToRight = (newRight: TExpression): void => {
+        right = newRight;
+    };
 
     return {
         tokenLiteral,
         string,
         token: input.token,
         operator,
-        right, // right 는 set 을 외부에 공개
+        insertToRight,
+        getRight: () => right,
     };
 }

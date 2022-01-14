@@ -187,7 +187,7 @@ export function Parser(parserInput: TParserInput): TParser {
 
         getNextToken();
 
-        expression.right = parseExpression(precedences.PREFIX);
+        expression.insertToRight(parseExpression(precedences.PREFIX) as TExpression)
         return expression;
     };
 
@@ -202,7 +202,7 @@ export function Parser(parserInput: TParserInput): TParser {
         const currentPrecedence = getPrecedences(currentToken.type);
         getNextToken();
 
-        expression.right = parseExpression(currentPrecedence);
+        expression.insertToRight(parseExpression(currentPrecedence) as TExpression)
         return expression;
     };
 
@@ -215,7 +215,7 @@ export function Parser(parserInput: TParserInput): TParser {
         while (currentToken.type != tokenPool.EOF) {
             const statement = parseStatement();
             if (statement) {
-                program.statements = [...program.statements, statement];
+                program.addToStatement(statement)
             }
             getNextToken();
         }

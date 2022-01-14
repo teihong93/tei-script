@@ -148,8 +148,8 @@ it('파서 전위 연산자 테스트(8)', () => {
         const exp = statement.expression as TPrefixExpression;
 
         expect(exp.operator).to.equal(t.operator);
-        expect(exp.right).exist;
-        testIntegerLiteral(exp.right as TExpression,t.value)
+        expect(exp.getRight()).exist;
+        testIntegerLiteral(exp.getRight() as TExpression,t.value)
     }
 });
 
@@ -179,11 +179,40 @@ it('파서 중위 연산자 테스트(9)', () => {
         const exp = statement.expression as TInfixExpression;
 
         expect(exp.operator).to.equal(t.operator);
-        expect(exp.right).exist;
+        expect(exp.getRight()).exist;
         expect(exp.left).exist;
 
         testIntegerLiteral(exp.left as TExpression,t.leftValue)
-        testIntegerLiteral(exp.right as TExpression,t.rightValue)
+        testIntegerLiteral(exp.getRight() as TExpression,t.rightValue)
+
+    }
+});
+
+it('파서 우선순위 테스트(10)', () => {
+
+    const tests: {input: string, expected:string}[] = [
+        {input: '-a*b', expected:'((-a)*b)'},
+        {input: '!-a', expected:'(!(-a))'},
+        {input: 'a+b+c', expected:'((a+b)+c)'},
+        {input: 'a+b-c', expected:'((a+b)-c)'},
+        {input: 'a*b*c', expected:'((a*b)*c)'},
+        {input: 'a*b/c', expected:'((a*b)/c)'},
+        {input: 'a+b/c', expected:'(a+(b/c))'},
+        {input: 'a+b*c+d/e-f', expected:'(((a+(b*c))+(d/e))-f)'},
+        {input: '3+4;-5*5', expected:'(3+4)((-5)*5)'},
+        {input: '5>4==3<4', expected:'((5>4)==(3<4))'},
+        {input: '3+4*5==3*1+4*5', expected:'((3+(4*5))==((3*1)+(4*5)))'},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.string()).to.equal(t.expected);
 
     }
 });

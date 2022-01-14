@@ -14,14 +14,17 @@ export function Program(programInput: TProgramInput): TProgram {
         }
     };
 
-    const string = () => {
-        return statements.reduce((acc, e) => acc + e.string(), '');
+    const string = () => statements.reduce((acc, e) => acc + e.string(), '');
+
+    const addToStatement = (statement: TStatement) => {
+        statements.push(statement)
     };
 
     return {
         tokenLiteral,
         statements,
         string,
+        addToStatement,
     };
 }
 

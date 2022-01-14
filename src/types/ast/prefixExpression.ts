@@ -7,4 +7,7 @@ export type TPrefixExpressionInput = {
     right?: TExpression
 }
 
-export type TPrefixExpression = TPrefixExpressionInput & TExpression
+export type TPrefixExpression = TPrefixExpressionInput & TExpression & {
+    insertToRight:(exp:TExpression)=>void
+    getRight:()=>TExpression|undefined,
+}

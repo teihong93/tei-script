@@ -6,7 +6,9 @@ export function Identifier(input: TIdentifierInput): TIdentifier {
     let value:string = input.value;
 
     const tokenLiteral = () => getTokenLiteral({token:input.token});
-    const string = () => value
+    const string = () => {
+        return value;
+    }
 
     return {
         tokenLiteral,
