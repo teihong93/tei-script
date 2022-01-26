@@ -1,13 +1,14 @@
 import {getTokenLiteral} from './getTokenLiteral';
 import {TPrefixExpression, TPrefixExpressionInput} from '../types/ast/prefixExpression';
 import {TExpression} from '../types/ast/expression';
+import {Ttoken} from '../types/token';
 
 export function PrefixExpression(input: TPrefixExpressionInput): TPrefixExpression {
 
     const operator: string = input.operator;
     let right: TExpression | undefined = input.right;
+    let token:Ttoken = {...input.token}
 
-    const tokenLiteral = () => getTokenLiteral({token: input.token});
     const string = () => {
         return `(${operator}${right?.string()})`;
     };
@@ -17,9 +18,9 @@ export function PrefixExpression(input: TPrefixExpressionInput): TPrefixExpressi
     };
 
     return {
-        tokenLiteral,
+        tokenLiteral:getTokenLiteral({token}),
         string,
-        token: input.token,
+        token,
         operator,
         insertToRight,
         getRight: () => right,

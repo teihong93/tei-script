@@ -15,11 +15,12 @@ import {TExpression} from '../types/ast/expression';
 import {IntegerLiteral} from '../ast/integerLiteral';
 import {PrefixExpression} from '../ast/prefixExpression';
 import {InfixExpression} from '../ast/infixExpression';
+import {Bool} from '../ast/bool';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
-    let currentToken: Ttoken | undefined;        /* 현재 토큰 */
-    let nextToken: Ttoken | undefined;        /* 다음 읽을 토큰 */
+    let currentToken: Ttoken;        /* 현재 토큰 */
+    let nextToken: Ttoken;        /* 다음 읽을 토큰 */
     let errors: string[] = [];        /* 파싱 에러 메시지 목록 */
 
     /* 프랫파싱을위한 함수들 */
@@ -30,8 +31,12 @@ export function Parser(parserInput: TParserInput): TParser {
         // 토큰을 두개 읽어, 현재와 다음 토큰을 셋팅함.
         getNextToken();
         getNextToken();
+
         registerPrefix(tokenPool.IDENT, parseIdentifier); // 식별자 토큰 처리 함수 등록
         registerPrefix(tokenPool.INT, parseIntegerLiteral); // 정수 리터럴 토큰 처리 함수 등록
+        registerPrefix(tokenPool.TRUE, parseBool); // Bool 토큰 처리 함수 등록
+        registerPrefix(tokenPool.FALSE, parseBool); // Bool 토큰 처리 함수 등록
+
         registerPrefix(tokenPool.BANG, parsePrefixExpression); // !전위연산자 처리 함수 등록
         registerPrefix(tokenPool.MINUS, parsePrefixExpression); // -전위연산자 처리 함수 등록
 
@@ -61,15 +66,15 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const currentTokenIs = (t: Ttoken['type']) => {
-        return currentToken?.type === t;
+        return currentToken.type === t;
     };
 
     const nextTokenIs = (t: Ttoken['type']) => {
-        return nextToken?.type === t;
+        return nextToken.type === t;
     };
 
     const parseStatement = (): TStatement | undefined => {
-        switch (currentToken?.type) {
+        switch (currentToken.type) {
             case tokenPool.LET :
                 return parseLetStatement();
             case tokenPool.RETURN :
@@ -80,7 +85,7 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const nextTokenError = (expected: string) => {
-        errors.push(`다음토큰은 ${expected} 를 예상했지만 ${nextToken?.type} 가 옴`);
+        errors.push(`다음토큰은 ${expected} 를 예상했지만 ${nextToken.type} 가 옴`);
     };
 
     const noPrefixParseFnError = (tokenType: Ttoken['type']) => {
@@ -145,7 +150,6 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseExpression = (precedence: precedences): TExpression | undefined => {
-        if (!currentToken || !nextToken) return;
 
         const prefix = getPrefixParseFns(currentToken.type);
         if (!prefix) {
@@ -168,18 +172,19 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseIdentifier = (): TExpression => {
-        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
         return Identifier({token: currentToken, value: currentToken.literal});
     };
 
     const parseIntegerLiteral = (): TExpression => {
-        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
         const literalNumber = parseInt(currentToken.literal);
         return IntegerLiteral({token: currentToken, value: literalNumber});
     };
 
+    const parseBool = (): TExpression => {
+        return Bool({token: currentToken, value: currentTokenIs(tokenPool.TRUE)});
+    };
+
     const parsePrefixExpression = (): TExpression => {
-        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
         const expression = PrefixExpression({
             token: currentToken,
             operator: currentToken.literal,
@@ -192,7 +197,6 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseInfixExpression = (left: TExpression): TExpression => {
-        if (!currentToken) throw new Error('토큰이 초기화되지 않음.');
         const expression = InfixExpression({
             token: currentToken,
             operator: currentToken.literal,
@@ -207,8 +211,6 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseProgram = (): TProgram => {
-        if (currentToken === undefined || nextToken === undefined)
-            throw new Error('토큰이 초기화되지 않음.');
 
         const program = Program({statements: []});
 

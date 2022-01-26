@@ -1,16 +1,18 @@
 import {getTokenLiteral} from './getTokenLiteral';
 import {TReturnStatement, TReturnStatementInput} from '../types/ast/returnStatement';
 import {TExpression} from '../types/ast/expression';
+import {Ttoken} from '../types/token';
 
 
 export function ReturnStatement(input: TReturnStatementInput): TReturnStatement {
 
     let returnValue: TExpression;
+    let token:Ttoken = {...input.token}
 
     const statementNode = () => {
     };
 
-    const tokenLiteral = () => getTokenLiteral({token: input.token});
+    const tokenLiteral = getTokenLiteral({token});
 
     const string = () => {
         return `${tokenLiteral()} ${returnValue ? returnValue.string() : ''} ;`;
@@ -20,6 +22,6 @@ export function ReturnStatement(input: TReturnStatementInput): TReturnStatement 
         tokenLiteral,
         statementNode,
         string,
-        token: input.token,
+        token,
     };
 }

@@ -1,5 +1,4 @@
 import {expect, assert} from 'chai';
-import {TStatement} from '../types/ast/ast';
 import {Lexer} from '../lexer/lexter';
 import {Parser} from './parser';
 import {TParser} from '../types/parser';
@@ -10,6 +9,7 @@ import {TIntegerLiteral} from '../types/ast/integerLiteral';
 import {TPrefixExpression} from '../types/ast/prefixExpression';
 import {TExpression} from '../types/ast/expression';
 import {TInfixExpression} from '../types/ast/infixExpression';
+import {TBool} from '../types/ast/bool';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -24,6 +24,37 @@ const testIntegerLiteral = (il: TExpression, value: number) => {
     const integ = il as TIntegerLiteral;
     expect(integ.value).to.equal(value);
     expect(integ.tokenLiteral()).to.equal(`${value}`);
+};
+
+const testIdentifier = (exp: TExpression, value: string) => {
+    const identifier = exp as TIdentifier;
+    expect(identifier.value).to.equal(value);
+    expect(identifier.tokenLiteral()).to.equal(`${value}`);
+};
+
+const testLiteralExpression = (exp: TExpression, expected: any) => {
+    switch (typeof expected) {
+        case 'number':
+            return testIntegerLiteral(exp, expected);
+        case 'string':
+            return testIdentifier(exp, expected);
+        case 'boolean':
+            return testBoolLiteral(exp,expected);
+    }
+};
+
+const testInfixExpression = (exp: TExpression, left: any, operator: string, right: any) => {
+    const opExp = exp as TInfixExpression;
+
+    testLiteralExpression(opExp.left, left);
+    expect(opExp.operator).to.equal(operator);
+    testLiteralExpression(opExp.getRight() as TExpression, right);
+};
+
+const testBoolLiteral = (exp: TExpression, bool: boolean) => {
+    const boolExp = exp as TBool;
+    expect(boolExp.value).to.equal(bool);
+    expect(boolExp.tokenLiteral()).to.equal(`${bool}`);
 };
 
 it('파서 LET 테스트(3)', () => {
@@ -149,19 +180,19 @@ it('파서 전위 연산자 테스트(8)', () => {
 
         expect(exp.operator).to.equal(t.operator);
         expect(exp.getRight()).exist;
-        testIntegerLiteral(exp.getRight() as TExpression,t.value)
+        testIntegerLiteral(exp.getRight() as TExpression, t.value);
     }
 });
 
 it('파서 중위 연산자 테스트(9)', () => {
 
-    const tests: {input: string, operator: string, leftValue: number,rightValue:number}[] = [
-        {input: '5+5;', operator: '+', leftValue:5,rightValue:5},
-        {input: '5-5;', operator: '-', leftValue:5,rightValue:5},
-        {input: '5*5;', operator: '*', leftValue:5,rightValue:5},
-        {input: '5>5;', operator: '>', leftValue:5,rightValue:5},
-        {input: '5==5;', operator: '==', leftValue:5,rightValue:5},
-        {input: '5!=5;', operator: '!=', leftValue:5,rightValue:5},
+    const tests: {input: string, operator: string, leftValue: number, rightValue: number}[] = [
+        {input: '5+5;', operator: '+', leftValue: 5, rightValue: 5},
+        {input: '5-5;', operator: '-', leftValue: 5, rightValue: 5},
+        {input: '5*5;', operator: '*', leftValue: 5, rightValue: 5},
+        {input: '5>5;', operator: '>', leftValue: 5, rightValue: 5},
+        {input: '5==5;', operator: '==', leftValue: 5, rightValue: 5},
+        {input: '5!=5;', operator: '!=', leftValue: 5, rightValue: 5},
     ];
 
     for (let t of tests) {
@@ -182,26 +213,28 @@ it('파서 중위 연산자 테스트(9)', () => {
         expect(exp.getRight()).exist;
         expect(exp.left).exist;
 
-        testIntegerLiteral(exp.left as TExpression,t.leftValue)
-        testIntegerLiteral(exp.getRight() as TExpression,t.rightValue)
-
+        testIntegerLiteral(exp.left as TExpression, t.leftValue);
+        testIntegerLiteral(exp.getRight() as TExpression, t.rightValue);
+        testInfixExpression(exp, t.leftValue, t.operator, t.rightValue);
     }
+
 });
 
 it('파서 우선순위 테스트(10)', () => {
 
-    const tests: {input: string, expected:string}[] = [
-        {input: '-a*b', expected:'((-a)*b)'},
-        {input: '!-a', expected:'(!(-a))'},
-        {input: 'a+b+c', expected:'((a+b)+c)'},
-        {input: 'a+b-c', expected:'((a+b)-c)'},
-        {input: 'a*b*c', expected:'((a*b)*c)'},
-        {input: 'a*b/c', expected:'((a*b)/c)'},
-        {input: 'a+b/c', expected:'(a+(b/c))'},
-        {input: 'a+b*c+d/e-f', expected:'(((a+(b*c))+(d/e))-f)'},
-        {input: '3+4;-5*5', expected:'(3+4)((-5)*5)'},
-        {input: '5>4==3<4', expected:'((5>4)==(3<4))'},
-        {input: '3+4*5==3*1+4*5', expected:'((3+(4*5))==((3*1)+(4*5)))'},
+    const tests: {input: string, expected: string}[] = [
+        {input: '1+2+3', expected: '((1+2)+3)'},
+        {input: '-a*b', expected: '((-a)*b)'},
+        {input: '!-a', expected: '(!(-a))'},
+        {input: 'a+b+c', expected: '((a+b)+c)'},
+        {input: 'a+b-c', expected: '((a+b)-c)'},
+        {input: 'a*b*c', expected: '((a*b)*c)'},
+        {input: 'a*b/c', expected: '((a*b)/c)'},
+        {input: 'a+b/c', expected: '(a+(b/c))'},
+        {input: 'a+b*c+d/e-f', expected: '(((a+(b*c))+(d/e))-f)'},
+        {input: '3+4;-5*5', expected: '(3+4)((-5)*5)'},
+        {input: '5>4==3<4', expected: '((5>4)==(3<4))'},
+        {input: '3+4*5==3*1+4*5', expected: '((3+(4*5))==((3*1)+(4*5)))'},
     ];
 
     for (let t of tests) {
@@ -215,4 +248,83 @@ it('파서 우선순위 테스트(10)', () => {
         expect(program.string()).to.equal(t.expected);
 
     }
+});
+
+it('파서 bool 테스트(11)', () => {
+
+    const tests: {input: string, expected: boolean}[] = [
+        {input: 'true;', expected: true},
+        {input: 'false;', expected: false},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.statements.length).to.equal(1);
+
+        const statement = program.statements[0] as TExpressionStatement;
+
+        const exp = statement.expression as TBool;
+
+        expect(exp.value).to.equal(t.expected);
+
+    }
+});
+
+it('Bool 이 섞인 우선순위 테스트 (12)', () => {
+
+    const tests: {input: string, expected: string}[] = [
+        {input: 'true', expected: 'true'},
+        {input: 'false', expected: 'false'},
+        {input: '3>5==false', expected: '((3>5)==false)'},
+        {input: '3<5==true', expected: '((3<5)==true)'},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.string()).to.equal(t.expected);
+
+    }
+});
+
+it('Bool 이 섞인 중위연산자 테스트 (13)', () => {
+
+    const tests: {input: string, operator: string, leftValue: any, rightValue: any}[] = [
+        {input: 'true==true;', operator: '==', leftValue: true, rightValue: true},
+        {input: 'true!=false;', operator: '!=', leftValue: true, rightValue: false},
+        {input: 'false==false;', operator: '==', leftValue: false, rightValue: false},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.statements.length).to.equal(1);
+
+        const statement = program.statements[0] as TExpressionStatement;
+
+        const exp = statement.expression as TInfixExpression;
+
+        expect(exp.operator).to.equal(t.operator);
+        expect(exp.getRight()).exist;
+        expect(exp.left).exist;
+
+        testInfixExpression(exp, t.leftValue, t.operator, t.rightValue);
+    }
+
 });

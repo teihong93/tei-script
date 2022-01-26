@@ -1,19 +1,20 @@
 import {getTokenLiteral} from './getTokenLiteral';
 import {TIdentifier, TIdentifierInput} from '../types/ast/identifier';
+import {Ttoken} from '../types/token';
 
 export function Identifier(input: TIdentifierInput): TIdentifier {
 
     let value:string = input.value;
+    let token:Ttoken = {...input.token}
 
-    const tokenLiteral = () => getTokenLiteral({token:input.token});
     const string = () => {
         return value;
     }
 
     return {
-        tokenLiteral,
+        tokenLiteral:getTokenLiteral({token}),
         value,
         string,
-        token: input.token,
+        token,
     };
 }
