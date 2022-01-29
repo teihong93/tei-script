@@ -15,7 +15,7 @@ export type TParser = {
     errors: () => string[]
 }
 
-export type TprefixParseFn = () => TExpression
+export type TprefixParseFn = () => TExpression|undefined
 export type TinfixParseFn = (expression: TExpression) => TExpression
 
 export type TPrefixParseFns = Map<TtokenType,TprefixParseFn>

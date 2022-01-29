@@ -328,3 +328,26 @@ it('Bool 이 섞인 중위연산자 테스트 (13)', () => {
     }
 
 });
+
+it('괄호가 있는 식 우선순위 테스트 (14)', () => {
+
+    const tests: {input: string, expected: string}[] = [
+        {input: '1+(2+3)+4', expected: '((1+(2+3))+4)'},
+        {input: '(5+5)*2', expected: '((5+5)*2)'},
+        {input: '2/(5+5)', expected: '(2/(5+5))'},
+        {input: '-(5+5)', expected: '(-(5+5))'},
+        {input: '!(true==true)', expected: '(!(true==true))'},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.string()).to.equal(t.expected);
+
+    }
+});

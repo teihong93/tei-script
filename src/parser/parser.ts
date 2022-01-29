@@ -37,6 +37,8 @@ export function Parser(parserInput: TParserInput): TParser {
         registerPrefix(tokenPool.TRUE, parseBool); // Bool 토큰 처리 함수 등록
         registerPrefix(tokenPool.FALSE, parseBool); // Bool 토큰 처리 함수 등록
 
+        registerPrefix(tokenPool.LPAREN, parseGroupedExpression); // ( 토큰 처리 함수 등록
+
         registerPrefix(tokenPool.BANG, parsePrefixExpression); // !전위연산자 처리 함수 등록
         registerPrefix(tokenPool.MINUS, parsePrefixExpression); // -전위연산자 처리 함수 등록
 
@@ -97,10 +99,7 @@ export function Parser(parserInput: TParserInput): TParser {
     * a 와 같은 식별자가 와야 하고, 그다음 = 과 같은 대입문이 와야 한다.
     */
     const parseLetStatement = () => {
-        if (!currentToken) return;
-
         let nowCurrentToken = currentToken;
-
         if (!expectNext(tokenPool.IDENT)) return;
 
         const identifier = Identifier({
@@ -123,8 +122,6 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseReturnStatement = () => {
-        if (!currentToken) return;
-
         const statememt = ReturnStatement({token: currentToken});
         getNextToken();
 
@@ -135,8 +132,6 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseExpressionStatement = () => {
-        if (!currentToken) return;
-
         const statement = ExpressionStatement({
             token: currentToken,
             expression: parseExpression(precedences.LOWEST),
@@ -157,7 +152,7 @@ export function Parser(parserInput: TParserInput): TParser {
             return;
         }
 
-        let leftExpression: TExpression = prefix();
+        let leftExpression = prefix();
 
         while (!nextTokenIs(tokenPool.SEMICOLON) && precedence < getPrecedences(nextToken.type)) {
             const infix = getInfixParseFns(nextToken.type);
@@ -165,7 +160,7 @@ export function Parser(parserInput: TParserInput): TParser {
                 return leftExpression;
             }
             getNextToken();
-            leftExpression = infix(leftExpression);
+            leftExpression = infix(leftExpression as TExpression);
         }
 
         return leftExpression;
@@ -184,6 +179,16 @@ export function Parser(parserInput: TParserInput): TParser {
         return Bool({token: currentToken, value: currentTokenIs(tokenPool.TRUE)});
     };
 
+    const parseGroupedExpression = (): TExpression | undefined => {
+        getNextToken();
+        const expression = parseExpression(precedences.LOWEST);
+
+        if (!expectNext(tokenPool.RPAREN)) {
+            return;
+        }
+        return expression;
+    };
+
     const parsePrefixExpression = (): TExpression => {
         const expression = PrefixExpression({
             token: currentToken,
@@ -192,7 +197,7 @@ export function Parser(parserInput: TParserInput): TParser {
 
         getNextToken();
 
-        expression.insertToRight(parseExpression(precedences.PREFIX) as TExpression)
+        expression.insertToRight(parseExpression(precedences.PREFIX) as TExpression);
         return expression;
     };
 
@@ -206,7 +211,7 @@ export function Parser(parserInput: TParserInput): TParser {
         const currentPrecedence = getPrecedences(currentToken.type);
         getNextToken();
 
-        expression.insertToRight(parseExpression(currentPrecedence) as TExpression)
+        expression.insertToRight(parseExpression(currentPrecedence) as TExpression);
         return expression;
     };
 
@@ -217,7 +222,7 @@ export function Parser(parserInput: TParserInput): TParser {
         while (currentToken.type != tokenPool.EOF) {
             const statement = parseStatement();
             if (statement) {
-                program.addToStatement(statement)
+                program.addToStatement(statement);
             }
             getNextToken();
         }
