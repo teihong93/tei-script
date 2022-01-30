@@ -10,6 +10,7 @@ import {TPrefixExpression} from '../types/ast/prefixExpression';
 import {TExpression} from '../types/ast/expression';
 import {TInfixExpression} from '../types/ast/infixExpression';
 import {TBool} from '../types/ast/bool';
+import {TIfExpression} from '../types/ast/ifExpression';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -350,4 +351,58 @@ it('괄호가 있는 식 우선순위 테스트 (14)', () => {
         expect(program.string()).to.equal(t.expected);
 
     }
+});
+
+it('if 테스트 (15)', () => {
+
+    const input = 'if (x<y) { x }'
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+
+    expect(program).exist;
+
+    expect(program.statements.length).to.equal(1)
+    const statement = program.statements[0] as TExpressionStatement;
+
+    const exp = statement.expression as TIfExpression;
+    testInfixExpression(exp.getCondition(), "x", "<", "y");
+
+    expect(exp.getConsequence()?.statements.length).to.equal(1)
+    const consequence = exp.getConsequence()?.statements[0] as TExpressionStatement;
+    testIdentifier(consequence.expression as TExpression,"x")
+
+    expect(exp.getAlternative()).to.equal(undefined)
+
+});
+
+it('if else 테스트 (16)', () => {
+
+    const input = 'if(x<y) {x} else {y}'
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+
+    expect(program).exist;
+
+    expect(program.statements.length).to.equal(1)
+    const statement = program.statements[0] as TExpressionStatement;
+
+    const exp = statement.expression as TIfExpression;
+    testInfixExpression(exp.getCondition(), "x", "<", "y");
+
+    expect(exp.getConsequence()?.statements.length).to.equal(1)
+    const consequence = exp.getConsequence()?.statements[0] as TExpressionStatement;
+    testIdentifier(consequence.expression as TExpression,"x")
+
+    expect(exp.getAlternative()?.statements.length).to.equal(1)
+    const alternative = exp.getAlternative()?.statements[0] as TExpressionStatement;
+    testIdentifier(alternative.expression as TExpression,"y")
+
 });

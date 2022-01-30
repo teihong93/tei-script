@@ -3,7 +3,9 @@ import {Ttoken} from '../token';
 
 export type TPrefixExpressionInput = {
     token: Ttoken,
+    /* prefix 연산자, - 나 ! 등 */
     operator: string,
+    /* 연산자의 오른쪽 노드 !a 라면 a */
     right?: TExpression
 }
 

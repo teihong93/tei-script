@@ -16,6 +16,9 @@ import {IntegerLiteral} from '../ast/integerLiteral';
 import {PrefixExpression} from '../ast/prefixExpression';
 import {InfixExpression} from '../ast/infixExpression';
 import {Bool} from '../ast/bool';
+import {IfExpression} from '../ast/ifExpression';
+import {TBlockStatement} from '../types/ast/blockStatement';
+import {BlockStatement} from '../ast/blockStatement';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -36,6 +39,8 @@ export function Parser(parserInput: TParserInput): TParser {
         registerPrefix(tokenPool.INT, parseIntegerLiteral); // 정수 리터럴 토큰 처리 함수 등록
         registerPrefix(tokenPool.TRUE, parseBool); // Bool 토큰 처리 함수 등록
         registerPrefix(tokenPool.FALSE, parseBool); // Bool 토큰 처리 함수 등록
+
+        registerPrefix(tokenPool.IF, parseIfExpression); // IF 토큰 처리 함수 등록
 
         registerPrefix(tokenPool.LPAREN, parseGroupedExpression); // ( 토큰 처리 함수 등록
 
@@ -122,13 +127,13 @@ export function Parser(parserInput: TParserInput): TParser {
     };
 
     const parseReturnStatement = () => {
-        const statememt = ReturnStatement({token: currentToken});
+        const statement = ReturnStatement({token: currentToken});
         getNextToken();
 
         while (!currentTokenIs(tokenPool.SEMICOLON)) {
             getNextToken();
         }
-        return statememt;
+        return statement;
     };
 
     const parseExpressionStatement = () => {
@@ -213,6 +218,49 @@ export function Parser(parserInput: TParserInput): TParser {
 
         expression.insertToRight(parseExpression(currentPrecedence) as TExpression);
         return expression;
+    };
+
+    const parseIfExpression = (): TExpression | undefined => {
+        const expression = IfExpression({token: currentToken});
+        if (!expectNext(tokenPool.LPAREN)) {
+            return;
+        }
+        getNextToken();
+        expression.setCondition(parseExpression(precedences.LOWEST) as TExpression);
+        if (!expectNext(tokenPool.RPAREN)) {
+            return;
+        }
+        if (!expectNext(tokenPool.LBRACE)) {
+            return;
+        }
+        expression.setConsequence(parseBlockStatement());
+
+        if (nextTokenIs(tokenPool.ELSE)) {
+            getNextToken();
+            if (!expectNext(tokenPool.LBRACE)) {
+                return;
+            }
+            expression.setAlternative(parseBlockStatement());
+        }
+        return expression;
+    };
+
+    const parseBlockStatement = (): TBlockStatement => {
+        const block = BlockStatement({
+            token: currentToken,
+            statements: [],
+        });
+
+        getNextToken();
+
+        while (!currentTokenIs(tokenPool.RBRACE) && !currentTokenIs(tokenPool.EOF)) {
+            const statement = parseStatement();
+            if (statement) {
+                block.statements.push(statement);
+            }
+            getNextToken();
+        }
+        return block;
     };
 
     const parseProgram = (): TProgram => {
