@@ -235,6 +235,7 @@ export function Parser(parserInput: TParserInput): TParser {
         }
         expression.setConsequence(parseBlockStatement());
 
+        // 만일, ELSE 문이 추가로 존재한다면 추가로 파싱
         if (nextTokenIs(tokenPool.ELSE)) {
             getNextToken();
             if (!expectNext(tokenPool.LBRACE)) {
