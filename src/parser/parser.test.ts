@@ -11,6 +11,7 @@ import {TExpression} from '../types/ast/expression';
 import {TInfixExpression} from '../types/ast/infixExpression';
 import {TBool} from '../types/ast/bool';
 import {TIfExpression} from '../types/ast/ifExpression';
+import {TFunctionExpression} from '../types/ast/functionExpression';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -40,7 +41,7 @@ const testLiteralExpression = (exp: TExpression, expected: any) => {
         case 'string':
             return testIdentifier(exp, expected);
         case 'boolean':
-            return testBoolLiteral(exp,expected);
+            return testBoolLiteral(exp, expected);
     }
 };
 
@@ -355,7 +356,7 @@ it('괄호가 있는 식 우선순위 테스트 (14)', () => {
 
 it('if 테스트 (15)', () => {
 
-    const input = 'if (x<y) { x }'
+    const input = 'if (x<y) { x }';
 
     const lexer = Lexer({input: input});
     const parser = Parser({lexer: lexer});
@@ -365,23 +366,23 @@ it('if 테스트 (15)', () => {
 
     expect(program).exist;
 
-    expect(program.statements.length).to.equal(1)
+    expect(program.statements.length).to.equal(1);
     const statement = program.statements[0] as TExpressionStatement;
 
     const exp = statement.expression as TIfExpression;
-    testInfixExpression(exp.getCondition(), "x", "<", "y");
+    testInfixExpression(exp.getCondition(), 'x', '<', 'y');
 
-    expect(exp.getConsequence()?.statements.length).to.equal(1)
+    expect(exp.getConsequence()?.statements.length).to.equal(1);
     const consequence = exp.getConsequence()?.statements[0] as TExpressionStatement;
-    testIdentifier(consequence.expression as TExpression,"x")
+    testIdentifier(consequence.expression as TExpression, 'x');
 
-    expect(exp.getAlternative()).to.equal(undefined)
+    expect(exp.getAlternative()).to.equal(undefined);
 
 });
 
 it('if else 테스트 (16)', () => {
 
-    const input = 'if(x<y) {x} else {y}'
+    const input = 'if(x<y) {x} else {y}';
 
     const lexer = Lexer({input: input});
     const parser = Parser({lexer: lexer});
@@ -391,18 +392,45 @@ it('if else 테스트 (16)', () => {
 
     expect(program).exist;
 
-    expect(program.statements.length).to.equal(1)
+    expect(program.statements.length).to.equal(1);
     const statement = program.statements[0] as TExpressionStatement;
 
     const exp = statement.expression as TIfExpression;
-    testInfixExpression(exp.getCondition(), "x", "<", "y");
+    testInfixExpression(exp.getCondition(), 'x', '<', 'y');
 
-    expect(exp.getConsequence()?.statements.length).to.equal(1)
+    expect(exp.getConsequence()?.statements.length).to.equal(1);
     const consequence = exp.getConsequence()?.statements[0] as TExpressionStatement;
-    testIdentifier(consequence.expression as TExpression,"x")
+    testIdentifier(consequence.expression as TExpression, 'x');
 
-    expect(exp.getAlternative()?.statements.length).to.equal(1)
+    expect(exp.getAlternative()?.statements.length).to.equal(1);
     const alternative = exp.getAlternative()?.statements[0] as TExpressionStatement;
-    testIdentifier(alternative.expression as TExpression,"y")
+    testIdentifier(alternative.expression as TExpression, 'y');
 
+});
+
+it('function 테스트 (17)', () => {
+
+    const input = 'function(x,y) { x + y; }';
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+
+    expect(program).exist;
+
+    expect(program.statements.length).to.equal(1);
+    const statement = program.statements[0] as TExpressionStatement;
+
+    const exp = statement.expression as TFunctionExpression;
+    expect(exp.getParameters().length).to.equal(2); // x,y
+
+    testLiteralExpression(exp.getParameters()[0], 'x');
+    testLiteralExpression(exp.getParameters()[1], 'y');
+
+    expect(exp.getBody().statements.length).to.equal(1); // { x+y; }
+
+    const bodyStatement = exp.getBody().statements[0] as TExpressionStatement;
+    testInfixExpression(bodyStatement.expression as TExpression, 'x', '+', 'y');
 });

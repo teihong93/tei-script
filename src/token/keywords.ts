@@ -4,7 +4,7 @@ type Tkeyword = {[k: string]: string}
 
 /* 언어에서 지원하는 예약어 목록 */
 export const keywords: Tkeyword = {
-    'fn': tokenPool.FUNCTION,
+    'function': tokenPool.FUNCTION,
     'let': tokenPool.LET,
     'true': tokenPool.TRUE,
     'false': tokenPool.FALSE,

@@ -19,6 +19,8 @@ import {Bool} from '../ast/bool';
 import {IfExpression} from '../ast/ifExpression';
 import {TBlockStatement} from '../types/ast/blockStatement';
 import {BlockStatement} from '../ast/blockStatement';
+import {FunctionExpression} from '../ast/functionExpression';
+import {TIdentifier} from '../types/ast/identifier';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -41,6 +43,7 @@ export function Parser(parserInput: TParserInput): TParser {
         registerPrefix(tokenPool.FALSE, parseBool); // Bool 토큰 처리 함수 등록
 
         registerPrefix(tokenPool.IF, parseIfExpression); // IF 토큰 처리 함수 등록
+        registerPrefix(tokenPool.FUNCTION, parseFunctionExpression); // FUNCTION 토큰 처리 함수 등록
 
         registerPrefix(tokenPool.LPAREN, parseGroupedExpression); // ( 토큰 처리 함수 등록
 
@@ -262,6 +265,56 @@ export function Parser(parserInput: TParserInput): TParser {
             getNextToken();
         }
         return block;
+    };
+
+    const parseFunctionExpression = (): TExpression | undefined => {
+        const literal = FunctionExpression({
+            token: currentToken,
+        });
+        if (!expectNext(tokenPool.LPAREN)) {
+            return;
+        }
+
+        literal.setParameters(parseFunctionParameters() as TIdentifier[]);
+
+        if (!expectNext(tokenPool.LBRACE)) {
+            return;
+        }
+
+        literal.setBody(parseBlockStatement());
+        return literal;
+    };
+
+    const parseFunctionParameters = (): TIdentifier[] | undefined => {
+        const identifiers: TIdentifier[] = [];
+        if (nextTokenIs(tokenPool.RPAREN)) {
+            getNextToken();
+            return identifiers;
+        }
+        getNextToken();
+
+        const ident = Identifier({
+            token: currentToken,
+            value: currentToken.literal,
+        });
+
+        identifiers.push(ident);
+
+        while (nextTokenIs(tokenPool.COMMA)) {
+            getNextToken();
+            getNextToken();
+            const _ident = Identifier({
+                token: currentToken,
+                value: currentToken.literal,
+            });
+            identifiers.push(_ident);
+        }
+
+        if (!expectNext(tokenPool.RPAREN)) {
+            return;
+        }
+
+        return identifiers;
     };
 
     const parseProgram = (): TProgram => {
