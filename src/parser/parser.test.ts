@@ -434,3 +434,30 @@ it('function 테스트 (17)', () => {
     const bodyStatement = exp.getBody().statements[0] as TExpressionStatement;
     testInfixExpression(bodyStatement.expression as TExpression, 'x', '+', 'y');
 });
+
+it('function 인자 테스트 (18)', () => {
+
+    const tests: {input: string, expected: string[]}[] = [
+        {input: 'function(){}', expected: []},
+        {input: 'function(x){}', expected: ['x']},
+        {input: 'function(x,y,z){}', expected: ['x','y','z']},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        const statement = program.statements[0] as TExpressionStatement
+        const functionExp = statement.expression as TFunctionExpression
+
+        expect(functionExp.getParameters().length).to.equal(t.expected.length);
+
+        for(let i in t.expected){
+         testLiteralExpression(functionExp.getParameters()[i],t.expected[i])
+        }
+    }
+
+});
