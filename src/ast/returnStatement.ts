@@ -7,7 +7,7 @@ import {Ttoken} from '../types/token';
 export function ReturnStatement(input: TReturnStatementInput): TReturnStatement {
 
     let returnValue: TExpression;
-    let token:Ttoken = {...input.token}
+    let token: Ttoken = {...input.token};
 
     const statementNode = () => {
     };
@@ -18,10 +18,17 @@ export function ReturnStatement(input: TReturnStatementInput): TReturnStatement 
         return `${tokenLiteral()} ${returnValue ? returnValue.string() : ''} ;`;
     };
 
+    const setReturnValue = (retV: TExpression) => {
+        returnValue = retV;
+    };
+    const getReturnValue = () => returnValue;
+
     return {
         tokenLiteral,
         statementNode,
         string,
         token,
+        setReturnValue,
+        getReturnValue
     };
 }

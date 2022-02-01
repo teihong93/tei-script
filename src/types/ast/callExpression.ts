@@ -10,13 +10,4 @@ export type TCallExpressionInput = {
     argument: TExpression[]
 }
 
-export type TCallExpression = TExpression & TCallExpressionInput & {
-    // /* (인자1,인자2) */
-    // getParameters: () => TIdentifier[]
-    // /* { 안의 식 } */
-    // getBody: () => TBlockStatement
-    // /* (인자1,인자2) */
-    // setParameters: (param: TIdentifier[]) => void
-    // /* { 안의 식 } */
-    // setBody: (body: TBlockStatement) => void
-}
+export type TCallExpression = TExpression & TCallExpressionInput;

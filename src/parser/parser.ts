@@ -125,23 +125,28 @@ export function Parser(parserInput: TParserInput): TParser {
 
         const statement = LetStatement({
             token: nowCurrentToken,
-            name: identifier,
         });
 
+        statement.setName(identifier);
         if (!expectNext(tokenPool.ASSIGN)) return;
 
-        //TODO 세미콜론을 만날때 까지 표현식을 건너뛴다.
-        while (!currentTokenIs(tokenPool.SEMICOLON)) {
+        getNextToken();
+        statement.setValue(parseExpression(precedences.LOWEST) as TExpression);
+
+        if (nextTokenIs(tokenPool.SEMICOLON)) {
             getNextToken();
         }
+
         return statement;
     };
 
     const parseReturnStatement = () => {
         const statement = ReturnStatement({token: currentToken});
         getNextToken();
+        const returnValue = parseExpression(precedences.LOWEST);
+        statement.setReturnValue(returnValue as TExpression);
 
-        while (!currentTokenIs(tokenPool.SEMICOLON)) {
+        if (nextTokenIs(tokenPool.SEMICOLON)) {
             getNextToken();
         }
         return statement;
@@ -327,11 +332,11 @@ export function Parser(parserInput: TParserInput): TParser {
 
     const parseCallExpression = (func: TExpression): TExpression => {
         const expression = CallExpression({
-            token:currentToken,
-            func:func,
-            argument: parseCallArguments() as TExpression[]
-        })
-        return expression
+            token: currentToken,
+            func: func,
+            argument: parseCallArguments() as TExpression[],
+        });
+        return expression;
     };
 
     const parseCallArguments = (): TExpression[] | undefined => {

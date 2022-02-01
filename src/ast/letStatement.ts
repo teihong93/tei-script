@@ -6,24 +6,35 @@ import {Ttoken} from '../types/token';
 
 export function LetStatement(input: TLetStatementInput): TLetStatement {
 
-    let name: TIdentifier = input.name;
-    let value: TExpression | undefined = input.value;     /* 값을 생성하는 표현식 */
-    let token:Ttoken = {...input.token}
+    let name: TIdentifier;
+    let value: TExpression;     /* 값을 생성하는 표현식 */
+    let token: Ttoken = {...input.token};
 
-    const statementNode = () => {};
+    const statementNode = () => {
+    };
 
     const tokenLiteral = getTokenLiteral({token});
 
     const string = () => {
-        return `${tokenLiteral()} ${name.string()} = ${value ? value.string() :''};`
-    }
+        return `${tokenLiteral()} ${name.string()} = ${value ? value.string() : ''};`;
+    };
+
+    const getName = () => name;
+    const setName = (nameArg: TIdentifier) => {
+        name = nameArg;
+    };
+    const getValue = () => value;
+    const setValue = (valueArg: TExpression) => {
+        value = valueArg;
+    };
 
     return {
         tokenLiteral,
         statementNode,
-        name,
-        value,
         string,
-        token,
+        getName,
+        setName,
+        getValue,
+        setValue,
     };
 }

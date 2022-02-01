@@ -64,8 +64,8 @@ it('파서 LET 테스트(3)', () => {
 
     const testLetStatement = (statement: TLetStatement, name: string) => {
         expect(statement.tokenLiteral()).to.equal('let');
-        expect(statement.name.value, name);
-        expect(statement.name?.tokenLiteral(), name);
+        expect(statement.getName().value, name);
+        expect(statement.getName().tokenLiteral(), name);
     };
 
     const input = `
