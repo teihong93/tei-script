@@ -115,19 +115,19 @@ export function Parser(parserInput: TParserInput): TParser {
     * a 와 같은 식별자가 와야 하고, 그다음 = 과 같은 대입문이 와야 한다.
     */
     const parseLetStatement = () => {
-        let nowCurrentToken = currentToken;
+
+        const statement = LetStatement({
+            token: currentToken,
+        });
         if (!expectNext(tokenPool.IDENT)) return;
 
         const identifier = Identifier({
-            token: nowCurrentToken,
-            value: nowCurrentToken.literal,
+            token: currentToken,
+            value: currentToken.literal,
         });
 
-        const statement = LetStatement({
-            token: nowCurrentToken,
-        });
+        statement.setName(identifier)
 
-        statement.setName(identifier);
         if (!expectNext(tokenPool.ASSIGN)) return;
 
         getNextToken();
