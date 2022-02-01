@@ -12,6 +12,6 @@ export type TInfixExpressionInput = {
 }
 
 export type TInfixExpression = TInfixExpressionInput & TExpression & {
-    insertToRight: (exp: TExpression) => void,
+    setRight: (exp: TExpression) => void,
     getRight: () => TExpression | undefined,
 }

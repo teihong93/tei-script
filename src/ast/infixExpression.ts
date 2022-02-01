@@ -11,7 +11,7 @@ export function InfixExpression(input: TInfixExpressionInput): TInfixExpression 
     let token:Ttoken = {...input.token}
 
     const string = () => `(${left.string()}${operator}${right?.string()})`;
-    const insertToRight = (newRight: TExpression) => {
+    const setRight = (newRight: TExpression) => {
         right = newRight;
     };
 
@@ -22,6 +22,6 @@ export function InfixExpression(input: TInfixExpressionInput): TInfixExpression 
         operator,
         getRight :()=> right,
         left,
-        insertToRight,
+        setRight: setRight,
     };
 }

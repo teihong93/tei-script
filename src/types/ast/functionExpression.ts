@@ -8,7 +8,7 @@ export type TFunctionExpressionInput = {
     token: Ttoken,
 }
 
-export type TFunctionExpression = TFunctionExpressionInput & TExpression & {
+export type TFunctionExpression = TExpression & {
     /* (인자1,인자2) */
     getParameters: () => TIdentifier[]
     /* { 안의 식 } */

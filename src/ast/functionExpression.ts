@@ -30,7 +30,6 @@ export function FunctionExpression(input: TFunctionExpressionInput): TFunctionEx
     return {
         tokenLiteral,
         string,
-        token,
         getParameters,
         setParameters,
         getBody,

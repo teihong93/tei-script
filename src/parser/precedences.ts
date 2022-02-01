@@ -22,6 +22,7 @@ export function Precedence() {
         [tokenPool.MINUS]: precedences.SUM,
         [tokenPool.SLASH]: precedences.PRODUCT,
         [tokenPool.ASTERISK]: precedences.PRODUCT,
+        [tokenPool.LPAREN]: precedences.CALL, // 함수를 call 할 때 ( 를 의미.
     };
 
     const getPrecedences = (tokenType: TtokenType): precedences => {

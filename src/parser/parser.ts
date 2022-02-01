@@ -21,6 +21,7 @@ import {TBlockStatement} from '../types/ast/blockStatement';
 import {BlockStatement} from '../ast/blockStatement';
 import {FunctionExpression} from '../ast/functionExpression';
 import {TIdentifier} from '../types/ast/identifier';
+import {CallExpression} from '../ast/callExpression';
 
 export function Parser(parserInput: TParserInput): TParser {
     let lexer: Tlexer = parserInput.lexer;    /* 렉서의 인스턴스 */
@@ -58,6 +59,13 @@ export function Parser(parserInput: TParserInput): TParser {
         registerInfix(tokenPool.NOT_EQ, parseInfixExpression); // != 중위연산자 처리 함수 등록
         registerInfix(tokenPool.LT, parseInfixExpression); // < 중위연산자 처리 함수 등록
         registerInfix(tokenPool.GT, parseInfixExpression); // > 중위연산자 처리 함수 등록
+
+        /*
+        * 함수 call 시 ( 토큰은 함수 와 인자 사이의 중위 연산자로 동작한다. add(2,3) 일 경우, <add> 와 <인자[2,3]> 사이의
+        * 중위 연산자로 파싱되어야 한다.
+        */
+        registerInfix(tokenPool.LPAREN, parseCallExpression);
+
     };
 
     const getNextToken = () => {
@@ -219,7 +227,7 @@ export function Parser(parserInput: TParserInput): TParser {
         const currentPrecedence = getPrecedences(currentToken.type);
         getNextToken();
 
-        expression.insertToRight(parseExpression(currentPrecedence) as TExpression);
+        expression.setRight(parseExpression(currentPrecedence) as TExpression);
         return expression;
     };
 
@@ -315,6 +323,43 @@ export function Parser(parserInput: TParserInput): TParser {
         }
 
         return identifiers;
+    };
+
+    const parseCallExpression = (func: TExpression): TExpression => {
+        const expression = CallExpression({
+            token:currentToken,
+            func:func,
+            argument: parseCallArguments() as TExpression[]
+        })
+        return expression
+    };
+
+    const parseCallArguments = (): TExpression[] | undefined => {
+        const pushArgIfExists = (argsArray: TExpression[]) => {
+            const arg = parseExpression(precedences.LOWEST);
+            if (arg) argsArray.push(arg);
+        };
+
+        const args: TExpression[] = [];
+        if (nextTokenIs(tokenPool.RPAREN)) {
+            getNextToken();
+            return args;
+        }
+        getNextToken();
+        pushArgIfExists(args);
+
+        while (nextTokenIs(tokenPool.COMMA)) {
+            getNextToken();
+            getNextToken();
+            pushArgIfExists(args);
+        }
+
+        if (!expectNext(tokenPool.RPAREN)) {
+            return;
+        }
+
+        return args;
+
     };
 
     const parseProgram = (): TProgram => {

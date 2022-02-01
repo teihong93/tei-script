@@ -30,7 +30,7 @@ it('코드 형태 데이터에 대한 lexer 테스트(2)', () => {
   let five = 5;
   let ten = 10;
   
-  let add = fn(x,y) {
+  let add = function(x,y) {
     x + y;
   };
   
@@ -63,7 +63,7 @@ it('코드 형태 데이터에 대한 lexer 테스트(2)', () => {
         {type: tokenPool.LET, literal: 'let'},
         {type: tokenPool.IDENT, literal: 'add'},
         {type: tokenPool.ASSIGN, literal: '='},
-        {type: tokenPool.FUNCTION, literal: 'fn'},
+        {type: tokenPool.FUNCTION, literal: 'function'},
         {type: tokenPool.LPAREN, literal: '('},
         {type: tokenPool.IDENT, literal: 'x'},
         {type: tokenPool.COMMA, literal: ','},

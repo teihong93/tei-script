@@ -12,6 +12,7 @@ import {TInfixExpression} from '../types/ast/infixExpression';
 import {TBool} from '../types/ast/bool';
 import {TIfExpression} from '../types/ast/ifExpression';
 import {TFunctionExpression} from '../types/ast/functionExpression';
+import {TCallExpression} from '../types/ast/callExpression';
 
 const checkParserErrors = (parser: TParser) => {
     const errors = parser.errors();
@@ -458,6 +459,55 @@ it('function 인자 테스트 (18)', () => {
         for(let i in t.expected){
          testLiteralExpression(functionExp.getParameters()[i],t.expected[i])
         }
+    }
+
+});
+
+it('call expression 테스트 (19)', () => {
+
+    const input = 'add(1,2*3,4+5);';
+
+    const lexer = Lexer({input: input});
+    const parser = Parser({lexer: lexer});
+
+    const program = parser.parseProgram();
+    checkParserErrors(parser);
+
+    expect(program).exist;
+
+    expect(program.statements.length).to.equal(1);
+    const statement = program.statements[0] as TExpressionStatement;
+
+    const exp = statement.expression as TCallExpression;
+
+    testIdentifier(exp.func, 'add');
+
+    expect(exp.argument.length).to.equal(3); // (1,2*3,4+5)
+
+    testLiteralExpression(exp.argument[0],1)
+    testInfixExpression(exp.argument[1],2,"*",3)
+    testInfixExpression(exp.argument[2],4,"+",5)
+
+});
+
+it('call expression 의 ( 가 들어간 우선순위 테스트(20)', () => {
+
+    const tests: {input: string, expected: string}[] = [
+        {input: "a+add(b*c)+d", expected: "((a+add((b*c)))+d)"},
+        {input: "add(a,b,1,2*3,4+5,add(6,7*8))", expected: "add(a,b,1,(2*3),(4+5),add(6,(7*8)))"},
+        {input: "add(a+b+c*d/f+g)", expected: "add((((a+b)+((c*d)/f))+g))"},
+    ];
+
+    for (let t of tests) {
+        const lexer = Lexer({input: t.input});
+        const parser = Parser({lexer: lexer});
+
+        const program = parser.parseProgram();
+        checkParserErrors(parser);
+
+        expect(program).exist;
+        expect(program.string()).to.equal(t.expected);
+
     }
 
 });
