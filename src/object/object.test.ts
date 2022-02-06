@@ -5,12 +5,14 @@ import {TInteger} from '../types/object/integer';
 import {expect} from 'chai';
 import objectPool from './objectPool';
 import {Eval} from '../evaluator/evaluator';
+import {TBool} from '../types/ast/bool';
+import {TBoolean} from '../types/object/boolean';
 
 const testEval = (input: string): TObject => {
     const lexer = Lexer({input});
     const parser = Parser({lexer});
     const program = parser.parseProgram();
-    return Eval({node:program});
+    return Eval({node: program});
 };
 
 const testIntegerObject = (obj: TObject, expected: number) => {
@@ -19,17 +21,32 @@ const testIntegerObject = (obj: TObject, expected: number) => {
     expect(intObj.value).to.equal(expected);
 };
 
+const testBooleanObject = (obj: TObject, expected: boolean) => {
+    const booleanObj = obj as TBoolean;
+    expect(booleanObj.type()).to.equal(objectPool.BOOLEAN_OBJECT);
+    expect(booleanObj.value).to.equal(expected);
+};
+
 it('Integer 객체 테스트 (21)', () => {
     const tests: {input: string, expected: number}[] = [
         {input: '5', expected: 5},
         {input: '10', expected: 10},
     ];
 
-    type a = {input:string,expected:number}
-    type b = {input:string}
-
     for (let test of tests) {
         const evaluated = testEval(test.input);
         testIntegerObject(evaluated, test.expected);
+    }
+});
+
+it('BOOLEAN 객체 테스트 (22)', () => {
+    const tests: {input: string, expected: boolean}[] = [
+        {input: 'true', expected: true},
+        {input: 'false', expected: false},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        testBooleanObject(evaluated, test.expected);
     }
 });

@@ -7,13 +7,20 @@ import {TObject} from '../types/object/object';
 import {TProgram} from '../types/ast/program';
 import {TExpressionStatement} from '../types/ast/expressionStatement';
 import {TExpression} from '../types/ast/expression';
+import {TRUE_BOOLEAN, FALSE_BOOLEAN} from '../object/boolean';
+import {TBool} from '../types/ast/bool';
+import {TBoolean} from '../types/object/boolean';
 
+/* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
     let node = input.node;
 
     switch (node.type) {
         case nodePool.INTEGER_LITERAL :
             return Integer({value: (node as TIntegerLiteral).value});
+
+        case nodePool.BOOL:
+            return getReferenceBoolean((node as TBool).value);
 
         case nodePool.PROGRAM:
             return evalStatements((node as TProgram).statements);
@@ -25,6 +32,10 @@ export function Eval(input: TEvalInput): TEval {
             throw new Error(`평가할 수 없는 타입 (${node.type}) 입니다.`);
     }
 
+}
+
+function getReferenceBoolean(boolValue: boolean): TBoolean {
+    return boolValue === true ? TRUE_BOOLEAN : FALSE_BOOLEAN;
 }
 
 function evalStatements(statements: TStatement[]): TObject {

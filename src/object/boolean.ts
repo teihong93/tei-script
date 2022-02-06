@@ -1,8 +1,7 @@
 import objectPool from './objectPool';
 import {TBoolean, TBooleanInput} from '../types/object/boolean';
 
-/* 내장된 ES5 Boolean() 함수와 이름이 겹쳐 Bool 로 사용 */
-export function Bool(input: TBooleanInput): TBoolean {
+function Boolean(input: TBooleanInput): TBoolean {
 
     let value = input.value;
 
@@ -15,3 +14,7 @@ export function Bool(input: TBooleanInput): TBoolean {
         value,
     };
 }
+
+/* boolean 객체는 여러개 존재할 필요가 없어서, 메모리에서 하나만 만들어서 레퍼런스만 주도록.*/
+export const TRUE_BOOLEAN = Boolean({value: true});
+export const FALSE_BOOLEAN = Boolean({value: false});
