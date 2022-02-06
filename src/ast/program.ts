@@ -2,6 +2,7 @@ import {
     TStatement,
 } from '../types/ast/ast';
 import {TProgram, TProgramInput} from '../types/ast/program';
+import nodePool from './nodePool';
 
 export function Program(programInput: TProgramInput): TProgram {
     let statements = programInput.statements;
@@ -17,7 +18,7 @@ export function Program(programInput: TProgramInput): TProgram {
     const string = () => statements.reduce((acc, e) => acc + e.string(), '');
 
     const addToStatement = (statement: TStatement) => {
-        statements.push(statement)
+        statements.push(statement);
     };
 
     return {
@@ -25,6 +26,7 @@ export function Program(programInput: TProgramInput): TProgram {
         statements,
         string,
         addToStatement,
+        type:nodePool.PROGRAM,
     };
 }
 

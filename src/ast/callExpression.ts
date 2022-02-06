@@ -3,6 +3,7 @@ import {TIdentifier} from '../types/ast/identifier';
 import {TBlockStatement} from '../types/ast/blockStatement';
 import {TCallExpression, TCallExpressionInput} from '../types/ast/callExpression';
 import {TExpression} from '../types/ast/expression';
+import nodePool from './nodePool';
 
 export function CallExpression(input: TCallExpressionInput): TCallExpression {
 
@@ -22,5 +23,6 @@ export function CallExpression(input: TCallExpressionInput): TCallExpression {
         token,
         argument,
         func,
+        type:nodePool.CALL_EXPRESSION,
     };
 }

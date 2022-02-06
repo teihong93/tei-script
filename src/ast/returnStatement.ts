@@ -2,6 +2,7 @@ import {getTokenLiteral} from './getTokenLiteral';
 import {TReturnStatement, TReturnStatementInput} from '../types/ast/returnStatement';
 import {TExpression} from '../types/ast/expression';
 import {Ttoken} from '../types/token';
+import nodePool from './nodePool';
 
 
 export function ReturnStatement(input: TReturnStatementInput): TReturnStatement {
@@ -29,6 +30,7 @@ export function ReturnStatement(input: TReturnStatementInput): TReturnStatement 
         string,
         token,
         setReturnValue,
-        getReturnValue
+        getReturnValue,
+        type:nodePool.RETURN_STATEMENT,
     };
 }

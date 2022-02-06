@@ -126,7 +126,7 @@ export function Parser(parserInput: TParserInput): TParser {
             value: currentToken.literal,
         });
 
-        statement.setName(identifier)
+        statement.setName(identifier);
 
         if (!expectNext(tokenPool.ASSIGN)) return;
 

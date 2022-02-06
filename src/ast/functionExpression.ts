@@ -4,6 +4,7 @@ import {Ttoken} from '../types/token';
 import {TFunctionExpression, TFunctionExpressionInput} from '../types/ast/functionExpression';
 import {TIdentifier} from '../types/ast/identifier';
 import {TBlockStatement} from '../types/ast/blockStatement';
+import nodePool from './nodePool';
 
 export function FunctionExpression(input: TFunctionExpressionInput): TFunctionExpression {
 
@@ -34,5 +35,6 @@ export function FunctionExpression(input: TFunctionExpressionInput): TFunctionEx
         setParameters,
         getBody,
         setBody,
+        type:nodePool.FUNCTION_EXPRESSION,
     };
 }

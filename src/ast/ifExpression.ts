@@ -3,6 +3,7 @@ import {TExpression} from '../types/ast/expression';
 import {Ttoken} from '../types/token';
 import {TIfExpression, TIfExpressionInput} from '../types/ast/ifExpression';
 import {TBlockStatement} from '../types/ast/blockStatement';
+import nodePool from './nodePool';
 
 export function IfExpression(input: TIfExpressionInput): TIfExpression {
 
@@ -37,5 +38,6 @@ export function IfExpression(input: TIfExpressionInput): TIfExpression {
         setCondition,
         setConsequence,
         setAlternative,
+        type:nodePool.IF_EXPRESSION,
     };
 }

@@ -4,4 +4,4 @@ import {TExpression} from './expression';
 export type TExpressionStatementInput = TTokenBase & {
     expression?: TExpression
 }
-export type TExpressionStatement = TStatement & TExpressionStatementInput
+export type TExpressionStatement = TStatement & TExpressionStatementInput & {}
