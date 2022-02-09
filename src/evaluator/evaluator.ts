@@ -13,6 +13,7 @@ import {TBoolean} from '../types/object/boolean';
 import {TPrefixExpression} from '../types/ast/prefixExpression';
 import objectPool from '../object/objectPool';
 import {NIL} from '../object/nil';
+import {TInteger} from '../types/object/integer';
 
 /* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
@@ -57,14 +58,15 @@ function evalStatements(statements: TStatement[]): TObject {
 function evalPrefixExpression(operator: string, right: TObject): TObject {
     switch (operator) {
         case '!':
-            return evalBangOperatorExpression(right);
+            return evalBangPrefixOperatorExpression(right);
+        case '-':
+            return evalMinusPrefixOperatorExpression(right);
         default:
             return NIL;
-
     }
 }
 
-function evalBangOperatorExpression(right: TObject): TObject {
+function evalBangPrefixOperatorExpression(right: TObject): TObject {
     switch (right) {
         case TRUE_BOOLEAN:
             return FALSE_BOOLEAN;
@@ -75,4 +77,12 @@ function evalBangOperatorExpression(right: TObject): TObject {
         default:
             return FALSE_BOOLEAN;
     }
+}
+
+function evalMinusPrefixOperatorExpression(right: TObject): TObject {
+    if (right.type() != objectPool.INTEGER_OBJECT) {
+        return NIL
+    }
+    const value = (right as TInteger).value
+    return Integer({value:-value})
 }
