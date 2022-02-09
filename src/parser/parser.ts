@@ -48,6 +48,10 @@ export function Parser(parserInput: TParserInput): TParser {
 
         registerPrefix(tokenPool.LPAREN, parseGroupedExpression); // ( 토큰 처리 함수 등록
 
+        /*
+        * 실질적인 의미에서의 전위 표현식은 아래의 !과 - 뿐이다(unary operator).
+        * 하지만 파싱의 편의성을 위해 위의 토큰들도 전위표현식처럼 다룬다.
+        */
         registerPrefix(tokenPool.BANG, parsePrefixExpression); // !전위연산자 처리 함수 등록
         registerPrefix(tokenPool.MINUS, parsePrefixExpression); // -전위연산자 처리 함수 등록
 

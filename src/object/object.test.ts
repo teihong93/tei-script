@@ -5,23 +5,22 @@ import {TInteger} from '../types/object/integer';
 import {expect} from 'chai';
 import objectPool from './objectPool';
 import {Eval} from '../evaluator/evaluator';
-import {TBool} from '../types/ast/bool';
 import {TBoolean} from '../types/object/boolean';
 
-const testEval = (input: string): TObject => {
+export const testEval = (input: string): TObject => {
     const lexer = Lexer({input});
     const parser = Parser({lexer});
     const program = parser.parseProgram();
     return Eval({node: program});
 };
 
-const testIntegerObject = (obj: TObject, expected: number) => {
+export const testIntegerObject = (obj: TObject, expected: number) => {
     const intObj = obj as TInteger;
     expect(intObj.type()).to.equal(objectPool.INTEGER_OBJECT);
     expect(intObj.value).to.equal(expected);
 };
 
-const testBooleanObject = (obj: TObject, expected: boolean) => {
+export const testBooleanObject = (obj: TObject, expected: boolean) => {
     const booleanObj = obj as TBoolean;
     expect(booleanObj.type()).to.equal(objectPool.BOOLEAN_OBJECT);
     expect(booleanObj.value).to.equal(expected);

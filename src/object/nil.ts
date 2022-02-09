@@ -1,9 +1,8 @@
 import objectPool from './objectPool';
-import {TBoolean, TBooleanInput} from '../types/object/boolean';
-import {TNil, TNilInput} from '../types/object/nil';
+import {TNil} from '../types/object/nil';
 
 /* 내장된 null 과 겹쳐 nil 로 표현 */
-export function Nil(): TNil {
+function Nil(): TNil {
 
     let value = null;
 
@@ -16,3 +15,5 @@ export function Nil(): TNil {
         value,
     };
 }
+
+export const NIL = Nil();
