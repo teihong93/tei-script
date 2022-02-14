@@ -32,8 +32,9 @@ const deLexRepl = () => {
 };
 
 const doParseRepl = () => {
+    console.log('parsing start... please enter code. [q] to quit');
     const query = () => {
-        rl.question('parsing start... please enter code. [q] to quit\n', (answer) => {
+        rl.question('', (answer) => {
             switch (answer.toLowerCase()) {
                 case 'q':
                     console.log('Bye!');
@@ -59,8 +60,9 @@ const doParseRepl = () => {
 };
 
 const doEvalRepl = () => {
+    console.log('eval start... please enter code. [q] to quit');
     const query = () => {
-        rl.question('eval start... please enter code. [q] to quit\n', (answer) => {
+        rl.question('', (answer) => {
             switch (answer.toLowerCase()) {
                 case 'q':
                     console.log('Bye!');

@@ -14,6 +14,8 @@ import {TPrefixExpression} from '../types/ast/prefixExpression';
 import objectPool from '../object/objectPool';
 import {NIL} from '../object/nil';
 import {TInteger} from '../types/object/integer';
+import {TInfixExpression} from '../types/ast/infixExpression';
+import {isEqual} from '../util/arrayHelper';
 
 /* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
@@ -32,9 +34,16 @@ export function Eval(input: TEvalInput): TEval {
         case nodePool.EXPRESSION_STATEMENT:
             return Eval({node: (node as TExpressionStatement).expression as TExpression});
 
-        case nodePool.PREFIX_EXPRESSION:
+        case nodePool.PREFIX_EXPRESSION: {
             const right = Eval({node: (node as TPrefixExpression).getRight() as TExpression});
             return evalPrefixExpression((node as TPrefixExpression).operator, right);
+        }
+
+        case nodePool.INFIX_EXPRESSION: {
+            const left = Eval({node: (node as TInfixExpression).left});
+            const right = Eval({node: (node as TInfixExpression).getRight() as TExpression});
+            return evalInfixExpression((node as TInfixExpression).operator, left, right);
+        }
 
         default:
             throw new Error(`평가할 수 없는 타입 (${node.type}) 입니다.`);
@@ -81,8 +90,33 @@ function evalBangPrefixOperatorExpression(right: TObject): TObject {
 
 function evalMinusPrefixOperatorExpression(right: TObject): TObject {
     if (right.type() != objectPool.INTEGER_OBJECT) {
-        return NIL
+        return NIL;
     }
-    const value = (right as TInteger).value
-    return Integer({value:-value})
+    const value = (right as TInteger).value;
+    return Integer({value: -value});
+}
+
+function evalInfixExpression(operator: string, left: TObject, right: TObject): TObject {
+    if ([left.type(), right.type()].every(isEqual(objectPool.INTEGER_OBJECT))) {
+        return evalIntegerInfixExpression(operator, left, right);
+    }
+    return NIL;
+}
+
+function evalIntegerInfixExpression(operator: string, left: TObject, right: TObject): TObject {
+    const leftValue = (left as TInteger).value;
+    const rightValue = (right as TInteger).value;
+
+    switch (operator) {
+        case '+':
+            return Integer({value: leftValue + rightValue});
+        case '-':
+            return Integer({value: leftValue - rightValue});
+        case '*':
+            return Integer({value: leftValue * rightValue});
+        case '/':
+            return Integer({value: leftValue / rightValue});
+        default:
+            return NIL;
+    }
 }
