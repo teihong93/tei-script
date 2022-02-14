@@ -101,6 +101,9 @@ function evalInfixExpression(operator: string, left: TObject, right: TObject): T
     if ([left.type(), right.type()].every(isEqual(objectPool.INTEGER_OBJECT))) {
         return evalIntegerInfixExpression(operator, left, right);
     }
+    if ([left.type(), right.type()].every(isEqual(objectPool.BOOLEAN_OBJECT))) {
+        return evalBoolInfixExpression(operator, left, right);
+    }
     return NIL;
 }
 
@@ -125,6 +128,18 @@ function evalIntegerInfixExpression(operator: string, left: TObject, right: TObj
             return getReferenceBoolean(leftValue === rightValue);
         case '!=':
             return getReferenceBoolean(leftValue !== rightValue);
+        default:
+            return NIL;
+    }
+}
+
+function evalBoolInfixExpression(operator: string, left: TObject, right: TObject): TObject {
+    /* BOOL 객체들은 같은 참조를 가지고 있어서, 객체 참조만 비교해도 된다*/
+    switch (operator) {
+        case '==':
+            return getReferenceBoolean(left === right);
+        case '!=':
+            return getReferenceBoolean(left !== right);
         default:
             return NIL;
     }

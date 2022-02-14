@@ -72,3 +72,21 @@ it('BOOL 표현식 테스트 (26)', () => {
         testBooleanObject(evaluated, test.expected);
     }
 });
+
+it('BOOL 표현식 테스트 + 중위 표현 테스트 (27)', () => {
+    const tests: {input: string, expected: boolean}[] = [
+        {input: 'true == true', expected: true},
+        {input: 'false == false', expected: true},
+        {input: 'true == false', expected: false},
+        {input: 'true!= false', expected: true},
+        {input: '(1<2) == true', expected: true},
+        {input: '(1<2) == false', expected: false},
+        {input: '(1>2) == true', expected: false},
+        {input: '(1>2) == false', expected: true},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        testBooleanObject(evaluated, test.expected);
+    }
+});
