@@ -54,3 +54,21 @@ it('중위연산자 평가 테스트 (25)', () => {
         testIntegerObject(evaluated, test.expected);
     }
 });
+
+it('BOOL 표현식 테스트 (26)', () => {
+    const tests: {input: string, expected: boolean}[] = [
+        {input: 'true', expected: true},
+        {input: 'false', expected: false},
+        {input: '1<2', expected: true},
+        {input: '1>2', expected: false},
+        {input: '2<2', expected: false},
+        {input: '1==1', expected: true},
+        {input: '1!=1', expected: false},
+        {input: '1!=2', expected: true},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        testBooleanObject(evaluated, test.expected);
+    }
+});

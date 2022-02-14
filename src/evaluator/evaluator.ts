@@ -51,6 +51,7 @@ export function Eval(input: TEvalInput): TEval {
 
 }
 
+/* TRUE 나 FALSE 는 싱글톤으로 존재하는게 좋음. 이미 만들어진 객체의 참조를 반환하는 함수 */
 function getReferenceBoolean(boolValue: boolean): TBoolean {
     return boolValue === true ? TRUE_BOOLEAN : FALSE_BOOLEAN;
 }
@@ -116,6 +117,14 @@ function evalIntegerInfixExpression(operator: string, left: TObject, right: TObj
             return Integer({value: leftValue * rightValue});
         case '/':
             return Integer({value: leftValue / rightValue});
+        case '<':
+            return getReferenceBoolean(leftValue < rightValue);
+        case '>':
+            return getReferenceBoolean(leftValue > rightValue);
+        case '==':
+            return getReferenceBoolean(leftValue === rightValue);
+        case '!=':
+            return getReferenceBoolean(leftValue !== rightValue);
         default:
             return NIL;
     }
