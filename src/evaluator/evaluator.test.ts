@@ -1,4 +1,6 @@
-import {testBooleanObject, testEval, testIntegerObject} from '../object/object.test';
+import {testBooleanObject, testEval, testIntegerObject, testNilObject} from '../object/object.test';
+import objectPool from '../object/objectPool';
+import {TInteger} from '../types/object/integer';
 
 it('! 전위연산자 평가 테스트 (23)', () => {
     const tests: {input: string, expected: boolean}[] = [
@@ -88,5 +90,26 @@ it('BOOL 표현식 테스트 + 중위 표현 테스트 (27)', () => {
     for (let test of tests) {
         const evaluated = testEval(test.input);
         testBooleanObject(evaluated, test.expected);
+    }
+});
+
+it('if else 평가 테스트 (28) ', () => {
+    const tests: {input: string, expected: any}[] = [
+        {input: 'if (true) { 10 }', expected: 10},
+        {input: 'if (false) { 10 }', expected: null},
+        {input: 'if(1<2) { 10 }', expected: 10},
+        {input: 'if(1>2) { 10 }', expected: null},
+        {input: 'if(1>2) { 10 } else {20}', expected: 20},
+        {input: 'if(1<2) { 10 } else {20}', expected: null},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        if (evaluated.type() === objectPool.INTEGER_OBJECT) {
+            testIntegerObject(evaluated, (evaluated as TInteger).value);
+        }
+        if (evaluated.type() === objectPool.NIL_OBJECT) {
+            testNilObject(evaluated);
+        }
     }
 });

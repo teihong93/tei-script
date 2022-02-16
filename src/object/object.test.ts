@@ -6,6 +6,7 @@ import {expect} from 'chai';
 import objectPool from './objectPool';
 import {Eval} from '../evaluator/evaluator';
 import {TBoolean} from '../types/object/boolean';
+import {TNil} from '../types/object/nil';
 
 export const testEval = (input: string): TObject => {
     const lexer = Lexer({input});
@@ -24,6 +25,12 @@ export const testBooleanObject = (obj: TObject, expected: boolean) => {
     const booleanObj = obj as TBoolean;
     expect(booleanObj.type()).to.equal(objectPool.BOOLEAN_OBJECT);
     expect(booleanObj.value).to.equal(expected);
+};
+
+export const testNilObject = (obj: TObject) => {
+    const nullObj = obj as TNil;
+    expect(nullObj.type()).to.equal(objectPool.NIL_OBJECT);
+    expect(nullObj.value).to.equal(null);
 };
 
 it('Integer 객체 테스트 (21)', () => {

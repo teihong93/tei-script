@@ -7,15 +7,16 @@ import {TObject} from '../types/object/object';
 import {TProgram} from '../types/ast/program';
 import {TExpressionStatement} from '../types/ast/expressionStatement';
 import {TExpression} from '../types/ast/expression';
-import {TRUE_BOOLEAN, FALSE_BOOLEAN} from '../object/boolean';
 import {TBool} from '../types/ast/bool';
-import {TBoolean} from '../types/object/boolean';
 import {TPrefixExpression} from '../types/ast/prefixExpression';
-import objectPool from '../object/objectPool';
-import {NIL} from '../object/nil';
-import {TInteger} from '../types/object/integer';
 import {TInfixExpression} from '../types/ast/infixExpression';
-import {isEqual} from '../util/arrayHelper';
+import {evalPrefixExpression} from './evalPrefixExpression';
+import {evalInfixExpression} from './evalInfixExpression';
+import {evalIfExpression} from './evalIfExpression';
+import {TBoolean} from '../types/object/boolean';
+import {FALSE_BOOLEAN, TRUE_BOOLEAN} from '../object/boolean';
+import {TIfExpression} from '../types/ast/ifExpression';
+import {TBlockStatement} from '../types/ast/blockStatement';
 
 /* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
@@ -45,6 +46,14 @@ export function Eval(input: TEvalInput): TEval {
             return evalInfixExpression((node as TInfixExpression).operator, left, right);
         }
 
+        case nodePool.BLOCK_STATEMENT: {
+            return evalStatements((node as TBlockStatement).statements);
+        }
+
+        case nodePool.IF_EXPRESSION: {
+            return evalIfExpression((node as TIfExpression));
+        }
+
         default:
             throw new Error(`평가할 수 없는 타입 (${node.type}) 입니다.`);
     }
@@ -52,7 +61,7 @@ export function Eval(input: TEvalInput): TEval {
 }
 
 /* TRUE 나 FALSE 는 싱글톤으로 존재하는게 좋음. 이미 만들어진 객체의 참조를 반환하는 함수 */
-function getReferenceBoolean(boolValue: boolean): TBoolean {
+export function getReferenceBoolean(boolValue: boolean): TBoolean {
     return boolValue === true ? TRUE_BOOLEAN : FALSE_BOOLEAN;
 }
 
@@ -65,82 +74,3 @@ function evalStatements(statements: TStatement[]): TObject {
     return result;
 }
 
-function evalPrefixExpression(operator: string, right: TObject): TObject {
-    switch (operator) {
-        case '!':
-            return evalBangPrefixOperatorExpression(right);
-        case '-':
-            return evalMinusPrefixOperatorExpression(right);
-        default:
-            return NIL;
-    }
-}
-
-function evalBangPrefixOperatorExpression(right: TObject): TObject {
-    switch (right) {
-        case TRUE_BOOLEAN:
-            return FALSE_BOOLEAN;
-        case FALSE_BOOLEAN:
-            return TRUE_BOOLEAN;
-        case NIL:
-            return TRUE_BOOLEAN;
-        default:
-            return FALSE_BOOLEAN;
-    }
-}
-
-function evalMinusPrefixOperatorExpression(right: TObject): TObject {
-    if (right.type() != objectPool.INTEGER_OBJECT) {
-        return NIL;
-    }
-    const value = (right as TInteger).value;
-    return Integer({value: -value});
-}
-
-function evalInfixExpression(operator: string, left: TObject, right: TObject): TObject {
-    if ([left.type(), right.type()].every(isEqual(objectPool.INTEGER_OBJECT))) {
-        return evalIntegerInfixExpression(operator, left, right);
-    }
-    if ([left.type(), right.type()].every(isEqual(objectPool.BOOLEAN_OBJECT))) {
-        return evalBoolInfixExpression(operator, left, right);
-    }
-    return NIL;
-}
-
-function evalIntegerInfixExpression(operator: string, left: TObject, right: TObject): TObject {
-    const leftValue = (left as TInteger).value;
-    const rightValue = (right as TInteger).value;
-
-    switch (operator) {
-        case '+':
-            return Integer({value: leftValue + rightValue});
-        case '-':
-            return Integer({value: leftValue - rightValue});
-        case '*':
-            return Integer({value: leftValue * rightValue});
-        case '/':
-            return Integer({value: leftValue / rightValue});
-        case '<':
-            return getReferenceBoolean(leftValue < rightValue);
-        case '>':
-            return getReferenceBoolean(leftValue > rightValue);
-        case '==':
-            return getReferenceBoolean(leftValue === rightValue);
-        case '!=':
-            return getReferenceBoolean(leftValue !== rightValue);
-        default:
-            return NIL;
-    }
-}
-
-function evalBoolInfixExpression(operator: string, left: TObject, right: TObject): TObject {
-    /* BOOL 객체들은 같은 참조를 가지고 있어서, 객체 참조만 비교해도 된다*/
-    switch (operator) {
-        case '==':
-            return getReferenceBoolean(left === right);
-        case '!=':
-            return getReferenceBoolean(left !== right);
-        default:
-            return NIL;
-    }
-}
