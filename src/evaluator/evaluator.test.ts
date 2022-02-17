@@ -100,13 +100,13 @@ it('if else 평가 테스트 (28) ', () => {
         {input: 'if(1<2) { 10 }', expected: 10},
         {input: 'if(1>2) { 10 }', expected: null},
         {input: 'if(1>2) { 10 } else {20}', expected: 20},
-        {input: 'if(1<2) { 10 } else {20}', expected: null},
+        {input: 'if(1<2) { 10 } else {20}', expected: 10},
     ];
 
     for (let test of tests) {
         const evaluated = testEval(test.input);
         if (evaluated.type() === objectPool.INTEGER_OBJECT) {
-            testIntegerObject(evaluated, (evaluated as TInteger).value);
+            testIntegerObject(evaluated, test.expected);
         }
         if (evaluated.type() === objectPool.NIL_OBJECT) {
             testNilObject(evaluated);
@@ -124,6 +124,17 @@ it('return statement 평가 테스트 (29) ', () => {
 
     for (let test of tests) {
         const evaluated = testEval(test.input);
-        testIntegerObject(evaluated, (evaluated as TInteger).value);
+        testIntegerObject(evaluated, test.expected);
+    }
+});
+
+it('return statement 평가가 지연되야 하는 경우 테스트 (31) ', () => {
+    const tests: {input: string, expected: number}[] = [
+        {input: 'if(2>1){  if(5>4) {return 10;} return 1; }', expected: 10},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        testIntegerObject(evaluated, test.expected);
     }
 });

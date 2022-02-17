@@ -36,7 +36,7 @@ export function Eval(input: TEvalInput): TEval {
         }
 
         case nodePool.PROGRAM: {
-            return evalStatements((node as TProgram).statements);
+            return evalProgram((node as TProgram));
         }
 
         case nodePool.EXPRESSION_STATEMENT: {
@@ -55,7 +55,7 @@ export function Eval(input: TEvalInput): TEval {
         }
 
         case nodePool.BLOCK_STATEMENT: {
-            return evalStatements((node as TBlockStatement).statements);
+            return evalBlockStatements((node as TBlockStatement));
         }
 
         case nodePool.IF_EXPRESSION: {
@@ -78,17 +78,22 @@ export function getReferenceBoolean(boolValue: boolean): TBoolean {
     return boolValue === true ? TRUE_BOOLEAN : FALSE_BOOLEAN;
 }
 
-function evalStatements(statements: TStatement[]): TObject {
+function evalProgram(program: TProgram): TObject {
+    return evalWithGetter(program, (res) => res.value);
+}
+
+function evalBlockStatements(block: TBlockStatement): TObject {
+    return evalWithGetter(block, (res) => res);
+}
+
+function evalWithGetter(target: TProgram | TBlockStatement, getter: (r: TReturnValue) => TObject) {
     let result: TObject | undefined;
-    for (let statement of statements) {
+    for (let statement of target.statements) {
         result = Eval({node: statement});
-
-        if (result.type() == objectPool.RETURN_VALUE_OBJECT) {
-            return (result as TReturnValue).value;
+        if (result && result.type() == objectPool.RETURN_VALUE_OBJECT) {
+            return getter(result as TReturnValue);
         }
-
     }
     if (!result) throw new Error('유효한 statement 가 존재하지 않습니다');
     return result;
 }
-
