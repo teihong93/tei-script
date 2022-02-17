@@ -113,3 +113,17 @@ it('if else 평가 테스트 (28) ', () => {
         }
     }
 });
+
+it('return statement 평가 테스트 (29) ', () => {
+    const tests: {input: string, expected: number}[] = [
+        {input: 'return 10;', expected: 10},
+        {input: 'return 10; return 9;', expected: 10},
+        {input: 'return 2*5; return 9;', expected: 10},
+        {input: '9; return 2*5; 9;', expected: 10},
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        testIntegerObject(evaluated, (evaluated as TInteger).value);
+    }
+});

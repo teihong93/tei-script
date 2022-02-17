@@ -17,23 +17,31 @@ import {TBoolean} from '../types/object/boolean';
 import {FALSE_BOOLEAN, TRUE_BOOLEAN} from '../object/boolean';
 import {TIfExpression} from '../types/ast/ifExpression';
 import {TBlockStatement} from '../types/ast/blockStatement';
+import {TReturnStatement} from '../types/ast/returnStatement';
+import {ReturnValue} from '../object/returnValue';
+import {TReturnValue} from '../types/object/returnValue';
+import objectPool from '../object/objectPool';
 
 /* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
     let node = input.node;
 
     switch (node.type) {
-        case nodePool.INTEGER_LITERAL :
+        case nodePool.INTEGER_LITERAL : {
             return Integer({value: (node as TIntegerLiteral).value});
+        }
 
-        case nodePool.BOOL:
+        case nodePool.BOOL: {
             return getReferenceBoolean((node as TBool).value);
+        }
 
-        case nodePool.PROGRAM:
+        case nodePool.PROGRAM: {
             return evalStatements((node as TProgram).statements);
+        }
 
-        case nodePool.EXPRESSION_STATEMENT:
+        case nodePool.EXPRESSION_STATEMENT: {
             return Eval({node: (node as TExpressionStatement).expression as TExpression});
+        }
 
         case nodePool.PREFIX_EXPRESSION: {
             const right = Eval({node: (node as TPrefixExpression).getRight() as TExpression});
@@ -54,6 +62,11 @@ export function Eval(input: TEvalInput): TEval {
             return evalIfExpression((node as TIfExpression));
         }
 
+        case nodePool.RETURN_STATEMENT: {
+            const returnValue = Eval({node: (node as TReturnStatement).getReturnValue()});
+            return ReturnValue({value: returnValue});
+        }
+
         default:
             throw new Error(`평가할 수 없는 타입 (${node.type}) 입니다.`);
     }
@@ -69,6 +82,11 @@ function evalStatements(statements: TStatement[]): TObject {
     let result: TObject | undefined;
     for (let statement of statements) {
         result = Eval({node: statement});
+
+        if (result.type() == objectPool.RETURN_VALUE_OBJECT) {
+            return (result as TReturnValue).value;
+        }
+
     }
     if (!result) throw new Error('유효한 statement 가 존재하지 않습니다');
     return result;
