@@ -4,10 +4,13 @@ import {Eval} from './evaluator';
 import {FALSE_BOOLEAN, TRUE_BOOLEAN} from '../object/boolean';
 import {NIL} from '../object/nil';
 import {TBlockStatement} from '../types/ast/blockStatement';
+import {isError} from '../object/error';
 
 export function evalIfExpression(ifExp: TIfExpression): TObject {
     const condition = Eval({node: ifExp.getCondition()});
-
+    if (isError(condition)) {
+        return condition;
+    }
     if (condition == TRUE_BOOLEAN) return getEvalBlockOrNil(ifExp.getConsequence());
     if (condition == FALSE_BOOLEAN) return getEvalBlockOrNil(ifExp.getAlternative());
 

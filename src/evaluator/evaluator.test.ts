@@ -1,6 +1,9 @@
 import {testBooleanObject, testEval, testIntegerObject, testNilObject} from '../object/object.test';
 import objectPool from '../object/objectPool';
 import {TInteger} from '../types/object/integer';
+import {expect} from 'chai';
+import {TError} from '../types/object/error';
+import {ErrorMsgPool} from '../object/error';
 
 it('! 전위연산자 평가 테스트 (23)', () => {
     const tests: {input: string, expected: boolean}[] = [
@@ -136,5 +139,58 @@ it('return statement 평가가 지연되야 하는 경우 테스트 (31) ', () =
     for (let test of tests) {
         const evaluated = testEval(test.input);
         testIntegerObject(evaluated, test.expected);
+    }
+});
+
+it('Error 핸들링 테스트 (32) ', () => {
+
+    const tests: {input: string, expected: string}[] = [
+        // {
+        //     input: '5 + true;',
+        //     expected: ErrorMsgPool.TYPE_MISMATCH + ': INTEGER + BOOLEAN',
+        // },
+        // {
+        //     input: '5 + true; 5;',
+        //     expected: ErrorMsgPool.TYPE_MISMATCH + ': INTEGER + BOOLEAN',
+        // },
+        // {
+        //     input: '-true',
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': - BOOLEAN',
+        // },
+        // {
+        //     input: 'true + false;',
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        // },
+        // {
+        //     input: 'true + false + true + false;',
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        // },
+        // {
+        //     input: '5; true + false; 5',
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        // },
+        // {
+        //     input: `"Hello" - "World"`,
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': STRING - STRING',
+        // },
+        // {
+        //     input: 'if (10 > 1) { true + false; }',
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        // },
+        // {
+        //     input: `if (10 > 1) { if (10 > 1) { return true + false; } return 1; }`,
+        //     expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        // },
+        {
+            input: 'true + false + true + false;',
+            expected: ErrorMsgPool.UNKNOWN_OPERATOR + ': BOOLEAN + BOOLEAN',
+        }
+    ];
+
+    for (let test of tests) {
+        const evaluated = testEval(test.input);
+        expect(evaluated.type()).to.equal(objectPool.ERROR_OBJECT);
+        const errorObj = evaluated as TError;
+        expect(errorObj.message).to.equal(test.expected);
     }
 });

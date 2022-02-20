@@ -5,6 +5,8 @@ import {NIL} from '../object/nil';
 import {isEqual} from '../util/arrayHelper';
 import objectPool from '../object/objectPool';
 import {getReferenceBoolean} from './evaluator';
+import {ErrorMsgPool} from '../object/error';
+import {createError} from './createError';
 
 export function evalInfixExpression(operator: string, left: TObject, right: TObject): TObject {
     if ([left.type(), right.type()].every(isEqual(objectPool.INTEGER_OBJECT))) {
@@ -13,7 +15,10 @@ export function evalInfixExpression(operator: string, left: TObject, right: TObj
     if ([left.type(), right.type()].every(isEqual(objectPool.BOOLEAN_OBJECT))) {
         return evalBoolInfixExpression(operator, left, right);
     }
-    return NIL;
+    if (left.type() != right.type()) {
+        return createError(ErrorMsgPool.TYPE_MISMATCH, left.type(), operator, right.type());
+    }
+    return createError(ErrorMsgPool.UNKNOWN_OPERATOR, left.type(), operator, right.type());
 }
 
 function evalIntegerInfixExpression(operator: string, left: TObject, right: TObject): TObject {
@@ -38,7 +43,7 @@ function evalIntegerInfixExpression(operator: string, left: TObject, right: TObj
         case '!=':
             return getReferenceBoolean(leftValue !== rightValue);
         default:
-            return NIL;
+            return createError(ErrorMsgPool.UNKNOWN_OPERATOR, left.type(), operator, right.type());
     }
 }
 
@@ -50,6 +55,6 @@ function evalBoolInfixExpression(operator: string, left: TObject, right: TObject
         case '!=':
             return getReferenceBoolean(left !== right);
         default:
-            return NIL;
+            return createError(ErrorMsgPool.UNKNOWN_OPERATOR, left.type(), operator, right.type());
     }
 }

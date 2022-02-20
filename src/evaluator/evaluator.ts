@@ -21,6 +21,8 @@ import {TReturnStatement} from '../types/ast/returnStatement';
 import {ReturnValue} from '../object/returnValue';
 import {TReturnValue} from '../types/object/returnValue';
 import objectPool from '../object/objectPool';
+import {TError} from '../types/object/error';
+import {isError} from '../object/error';
 
 /* ast 노드를 평가하는 함수. */
 export function Eval(input: TEvalInput): TEval {
@@ -45,12 +47,21 @@ export function Eval(input: TEvalInput): TEval {
 
         case nodePool.PREFIX_EXPRESSION: {
             const right = Eval({node: (node as TPrefixExpression).getRight() as TExpression});
+            if (isError(right)) {
+                return right;
+            }
             return evalPrefixExpression((node as TPrefixExpression).operator, right);
         }
 
         case nodePool.INFIX_EXPRESSION: {
             const left = Eval({node: (node as TInfixExpression).left});
+            if (isError(left)) {
+                return left;
+            }
             const right = Eval({node: (node as TInfixExpression).getRight() as TExpression});
+            if (isError(right)) {
+                return right;
+            }
             return evalInfixExpression((node as TInfixExpression).operator, left, right);
         }
 
@@ -64,6 +75,9 @@ export function Eval(input: TEvalInput): TEval {
 
         case nodePool.RETURN_STATEMENT: {
             const returnValue = Eval({node: (node as TReturnStatement).getReturnValue()});
+            if (isError(returnValue)) {
+                return returnValue;
+            }
             return ReturnValue({value: returnValue});
         }
 
@@ -93,7 +107,11 @@ function evalWithGetter(target: TProgram | TBlockStatement, getter: (r: TReturnV
         if (result && result.type() == objectPool.RETURN_VALUE_OBJECT) {
             return getter(result as TReturnValue);
         }
+        if (result && result.type() == objectPool.ERROR_OBJECT) {
+            return result;
+        }
     }
     if (!result) throw new Error('유효한 statement 가 존재하지 않습니다');
     return result;
 }
+

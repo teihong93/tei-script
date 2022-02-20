@@ -4,6 +4,9 @@ import {FALSE_BOOLEAN, TRUE_BOOLEAN} from '../object/boolean';
 import objectPool from '../object/objectPool';
 import {TInteger} from '../types/object/integer';
 import {Integer} from '../object/interger';
+import {createError} from './createError';
+import {ErrorMsgPool} from '../object/error';
+import tokenPool from '../token/tokenPool';
 
 export function evalPrefixExpression(operator: string, right: TObject): TObject {
     switch (operator) {
@@ -12,7 +15,7 @@ export function evalPrefixExpression(operator: string, right: TObject): TObject 
         case '-':
             return evalMinusPrefixOperatorExpression(right);
         default:
-            return NIL;
+            return createError(ErrorMsgPool.UNKNOWN_OPERATOR, operator, right.type());
     }
 }
 
@@ -31,7 +34,7 @@ function evalBangPrefixOperatorExpression(right: TObject): TObject {
 
 function evalMinusPrefixOperatorExpression(right: TObject): TObject {
     if (right.type() != objectPool.INTEGER_OBJECT) {
-        return NIL;
+        return createError(ErrorMsgPool.UNKNOWN_OPERATOR, tokenPool.MINUS, right.type());
     }
     const value = (right as TInteger).value;
     return Integer({value: -value});
