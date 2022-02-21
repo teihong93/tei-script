@@ -26,4 +26,5 @@ export const isError = (obj: TObject): boolean => {
 export const ErrorMsgPool = {
     'TYPE_MISMATCH': '타입이 일치하지 않습니다',
     'UNKNOWN_OPERATOR': '지원하지 않는 연산자입니다',
+    'IDENT_NOT_FOUNT': '식별자를 찾을 수 없습니다',
 };
